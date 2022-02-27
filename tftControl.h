@@ -10,7 +10,6 @@
 #endif
 
 void disableVSPIScreens();
-void disableHSPIScreens();
 void enableScreen1();
 void enableScreen2();
 void enableScreen3();

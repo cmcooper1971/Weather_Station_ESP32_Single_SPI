@@ -1,6 +1,6 @@
 /*
- Name:		Weather_Station_ESP32.ino
- Created:	8/8/2021 8:09:29 PM
+ Name:		Weather_Station_ESP32_Single_SPI.ino
+ Created:	27/02/2021 00:00:00
  Author:	Christopher Cooper
 */
 
@@ -52,18 +52,10 @@
 #define VSPI_CS2    21 // Screen two chip select.
 #define VSPI_CS3    16 // Screen three chip select.
 #define VSPI_CS4    17 // Screen four chip select.
-
-#define HSPI_MISO   12 // MISO - Not needed as it is a display.
-#define HSPI_MOSI   13 // MOSI
-#define HSPI_CLK    14 // SCK
-#define HSPI_DC     26 // DC
-#define HSPI_RST    27 // RST
-
-#define HSPI_CS9    39 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes.
-#define HSPI_CS5    15 // Screen five chip select.
-#define HSPI_CS6    25 // Screen six chip select.
-#define HSPI_CS7    33 // Screen seven chip select.
-#define HSPI_CS8    32 // Screen eight chip select.
+#define VSPI_CS5    15 // Screen five chip select.
+#define VSPI_CS6    25 // Screen six chip select.
+#define VSPI_CS7    33 // Screen seven chip select.
+#define VSPI_CS8    32 // Screen eight chip select.
 
 #define TFT_LED_OUT1	0 // LED backlight output pin.
 #define TFT_LED_OUT2	2 // LED backlight output pin.
@@ -75,21 +67,11 @@
 boolean switchOneState = false;
 boolean switchOneToggled = false;
 
-// Configure ILI9341 displays.
-
-SPIClass  SPI2(HSPI);
-
 // VSPI Class (default).
-Adafruit_ILI9341 tft1 = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_RST); // CS0 is a dummy pin
+Adafruit_ILI9341 tft = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_RST); // CS0 is a dummy pin
 
 //Software defined SPI.
 //Adafruit_ILI9341 tft1 = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_MOSI, VSPI_CLK, VSPI_RST, VSPI_MISO); // CS0 is a dummy pin 
-
-// HSPI Class.
-Adafruit_ILI9341 tft2 = Adafruit_ILI9341(&SPI2, HSPI_DC, HSPI_CS9, HSPI_RST); // CS9 is a dummy pin
-
-//Software defined SPI.
-//Adafruit_ILI9341 tft2 = Adafruit_ILI9341(HSPI_CS9, HSPI_DC, HSPI_MOSI, HSPI_CLK, HSPI_RST, HSPI_MISO); // CS9 is a dummy pin
 
 // Configure time settings.
 
@@ -397,7 +379,7 @@ bool initWiFi() {
 
 	enableScreen1();
 
-	drawBitmap(tft1, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
 
 	disableVSPIScreens();
 
@@ -426,7 +408,7 @@ bool initWiFi() {
 
 	enableScreen1();
 
-	drawBitmap(tft1, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
 
 	disableVSPIScreens();
 
@@ -439,7 +421,7 @@ bool initWiFi() {
 			Serial.println("Failed to connect.");
 			// If ESP32 fails to connect, recolour WiFi to red.
 			enableScreen1();
-			drawBitmap(tft1, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
+			drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
 			drawBlackBox();
 			disableVSPIScreens();
 			return false;
@@ -456,79 +438,79 @@ bool initWiFi() {
 
 	enableScreen1();
 
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setFont();
-	tft1.setCursor(23, 50);
-	tft1.print("WiFi Status: ");
-	tft1.setTextColor(BLUE);
-	tft1.setCursor(150, 50);
-	tft1.print(WiFi.status());
-	tft1.println("");
+	tft.setTextColor(BLACK, WHITE);
+	tft.setFont();
+	tft.setCursor(23, 50);
+	tft.print("WiFi Status: ");
+	tft.setTextColor(BLUE);
+	tft.setCursor(150, 50);
+	tft.print(WiFi.status());
+	tft.println("");
 
-	tft1.setCursor(23, 65);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.print("SSID: ");
-	tft1.setTextColor(BLUE);
-	tft1.setCursor(150, 65);
-	tft1.print(WiFi.SSID());
-	tft1.println("");
+	tft.setCursor(23, 65);
+	tft.setTextColor(BLACK, WHITE);
+	tft.print("SSID: ");
+	tft.setTextColor(BLUE);
+	tft.setCursor(150, 65);
+	tft.print(WiFi.SSID());
+	tft.println("");
 
-	tft1.setCursor(23, 80);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.print("IP Address: ");
-	tft1.setTextColor(BLUE);
-	tft1.setCursor(150, 80);
-	tft1.print(WiFi.localIP());
-	tft1.println("");
+	tft.setCursor(23, 80);
+	tft.setTextColor(BLACK, WHITE);
+	tft.print("IP Address: ");
+	tft.setTextColor(BLUE);
+	tft.setCursor(150, 80);
+	tft.print(WiFi.localIP());
+	tft.println("");
 
-	tft1.setCursor(23, 95);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.print("DNS Address: ");
-	tft1.setTextColor(BLUE);
-	tft1.setCursor(150, 95);
-	tft1.print(WiFi.dnsIP());
-	tft1.println("");
+	tft.setCursor(23, 95);
+	tft.setTextColor(BLACK, WHITE);
+	tft.print("DNS Address: ");
+	tft.setTextColor(BLUE);
+	tft.setCursor(150, 95);
+	tft.print(WiFi.dnsIP());
+	tft.println("");
 
-	tft1.setCursor(23, 110);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.print("Gateway Address: ");
-	tft1.setTextColor(BLUE);
-	tft1.setCursor(150, 110);
-	tft1.print(WiFi.gatewayIP());
-	tft1.println("");
+	tft.setCursor(23, 110);
+	tft.setTextColor(BLACK, WHITE);
+	tft.print("Gateway Address: ");
+	tft.setTextColor(BLUE);
+	tft.setCursor(150, 110);
+	tft.print(WiFi.gatewayIP());
+	tft.println("");
 
-	tft1.setCursor(23, 125);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.print("Signal Strenght: ");
-	tft1.setTextColor(BLUE);
-	tft1.setCursor(150, 125);
-	tft1.print(WiFi.RSSI());
-	tft1.println("");
+	tft.setCursor(23, 125);
+	tft.setTextColor(BLACK, WHITE);
+	tft.print("Signal Strenght: ");
+	tft.setTextColor(BLUE);
+	tft.setCursor(150, 125);
+	tft.print(WiFi.RSSI());
+	tft.println("");
 
-	tft1.setCursor(23, 140);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.print("Time Server: ");
-	tft1.setTextColor(BLUE);
-	tft1.setCursor(150, 140);
-	tft1.print(ntpServer);
+	tft.setCursor(23, 140);
+	tft.setTextColor(BLACK, WHITE);
+	tft.print("Time Server: ");
+	tft.setTextColor(BLUE);
+	tft.setCursor(150, 140);
+	tft.print(ntpServer);
 
 	// If ESP32 inits successfully in station mode, recolour WiFi to green.
 
-	drawBitmap(tft1, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
 
 	// Update message to advise unit is starting.
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setTextSize(1);
-	tft1.setTextColor(BLACK);
-	tft1.println("");
-	tft1.setCursor(20, 175);
-	tft1.print("Unit is starting...");
-	tft1.setFont();
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK);
+	tft.println("");
+	tft.setCursor(20, 175);
+	tft.print("Unit is starting...");
+	tft.setFont();
 
 	delay(3000);	// Wait a moment.
 
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 
 	disableVSPIScreens();
 
@@ -676,11 +658,11 @@ void printLocalTime() {
 
 		enableScreen1();
 
-		tft1.setTextColor(BLACK, WHITE);
-		tft1.setFont();
-		tft1.setTextSize(1);
-		tft1.setCursor(5, 230);
-		tft1.println("Failed, time set to default.");
+		tft.setTextColor(BLACK, WHITE);
+		tft.setFont();
+		tft.setTextSize(1);
+		tft.setCursor(5, 230);
+		tft.println("Failed, time set to default.");
 
 		disableVSPIScreens();
 
@@ -693,19 +675,19 @@ void printLocalTime() {
 
 	enableScreen1();
 
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setFont();
-	tft1.setTextSize(1);
-	tft1.setCursor(150, 230);
-	tft1.println("                ");
+	tft.setTextColor(BLACK, WHITE);
+	tft.setFont();
+	tft.setTextSize(1);
+	tft.setCursor(150, 230);
+	tft.println("                ");
 
 	// Actual date time to display.
 
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setFont();
-	tft1.setTextSize(1);
-	tft1.setCursor(5, 230);
-	tft1.println(&timeinfo, "%A, %B %d %Y %H:%M");
+	tft.setTextColor(BLACK, WHITE);
+	tft.setFont();
+	tft.setTextSize(1);
+	tft.setCursor(5, 230);
+	tft.println(&timeinfo, "%A, %B %d %Y %H:%M");
 
 	disableVSPIScreens();
 
@@ -725,14 +707,16 @@ void setup() {
 
 	pinMode(TFT_LED_OUT1, OUTPUT); // Enable TFT LED backlight control.
 	pinMode(TFT_LED_OUT2, OUTPUT); // Enable TFT LED backlight control.
+
 	pinMode(VSPI_CS1, OUTPUT); //VSPI CS
 	pinMode(VSPI_CS2, OUTPUT); //VSPI CS
 	pinMode(VSPI_CS3, OUTPUT); //VSPI CS
 	pinMode(VSPI_CS4, OUTPUT); //VSPI CS
-	pinMode(HSPI_CS5, OUTPUT); //HSPI CS
-	pinMode(HSPI_CS6, OUTPUT); //HSPI CS
-	pinMode(HSPI_CS7, OUTPUT); //HSPI CS
-	pinMode(HSPI_CS8, OUTPUT); //HSPI CS
+	pinMode(VSPI_CS5, OUTPUT); //VSPI CS
+	pinMode(VSPI_CS6, OUTPUT); //VSPI CS
+	pinMode(VSPI_CS7, OUTPUT); //VSPI CS
+	pinMode(VSPI_CS8, OUTPUT); //VSPI CS
+
 	pinMode(interruptSWITCH1, INPUT_PULLUP); //Interupt
 
 	// Configure interrupt.
@@ -744,13 +728,10 @@ void setup() {
 	digitalWrite(TFT_LED_OUT1, HIGH); // Output for LCD back light (low is off).
 	digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
 
-	delay(1000);
-
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
 
 	disableVSPIScreens();
-	disableHSPIScreens();
-
+	
 	delay(200);
 
 	// Set all tft1 chip select outputs low to configure all displays the same using tft.begin.
@@ -759,170 +740,136 @@ void setup() {
 	digitalWrite(VSPI_CS2, LOW);
 	digitalWrite(VSPI_CS3, LOW);
 	digitalWrite(VSPI_CS4, LOW);
+	digitalWrite(VSPI_CS5, LOW);
+	digitalWrite(VSPI_CS6, LOW);
+	digitalWrite(VSPI_CS7, LOW);
+	digitalWrite(VSPI_CS8, LOW);
 
 	// Send screen configuration.
 
 	//tft1.begin();
-	tft1.begin(40000000); // 40000000 27000000
-	tft1.setRotation(3);
-	tft1.setCursor(0, 0);
+	tft.begin(27000000); // 40000000 27000000
+	tft.setRotation(3);
+	tft.setCursor(0, 0);
 
 	// Reset all chip selects high once again.
 
 	disableVSPIScreens();
-	disableHSPIScreens();
-
-	delay(200);
-
-	// Set all tft2 chip select outputs low to configure all displays the same using tft.begin.
-
-	digitalWrite(HSPI_CS5, LOW);
-	digitalWrite(HSPI_CS6, LOW);
-	digitalWrite(HSPI_CS7, LOW);
-	digitalWrite(HSPI_CS8, LOW);
-
-	// Send screen configuration.
-
-	//tft2.begin();
-	tft2.begin(40000000);
-	tft2.setRotation(3);
-	tft2.setCursor(0, 0);
-
-	// Reset all chip selects high once again.
-
-	disableHSPIScreens();
-
-	delay(2000);
-
-	// Switch off TFT LED back light.
-
-	digitalWrite(TFT_LED_OUT1, LOW); // Output for LCD back light (low is off).
-	digitalWrite(TFT_LED_OUT2, LOW); // Output for LCD back light (low is off).
-
-	delay(200);
 
 	// Start up screen image and title.
 
 	enableScreen1();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen2();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen3();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen4();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen5();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
 	enableScreen6();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
 	enableScreen7();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
 	enableScreen8();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
-
-	delay(250);
-
-	digitalWrite(TFT_LED_OUT1, HIGH); // Output for LCD back light (low is off).
-
-	delay(250);
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
 	enableScreen1();
-	drawBitmap(tft1, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setTextSize(1);
-	tft1.setTextColor(BLACK);
-	tft1.setCursor(96, 200);
-	tft1.println("Weather Station");
-	tft1.setFont();
-	tft1.setTextSize(1);
-	tft1.setCursor(98, 210);
-	tft1.println("by Christopher Cooper");
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK);
+	tft.setCursor(96, 200);
+	tft.println("Weather Station");
+	tft.setFont();
+	tft.setTextSize(1);
+	tft.setCursor(98, 210);
+	tft.println("by Christopher Cooper");
 
 	disableVSPIScreens();
 
 	enableScreen2();
-	drawBitmap(tft1, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen3();
-	drawBitmap(tft1, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen4();
-	drawBitmap(tft1, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen5();
-	drawBitmap(tft2, 48, 96, rainbow, 128, 128);
-	disableHSPIScreens();
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	disableVSPIScreens();
 
 	enableScreen6();
-	drawBitmap(tft2, 48, 96, rainbow, 128, 128);
-	disableHSPIScreens();
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	disableVSPIScreens();
 
 	enableScreen7();
-	drawBitmap(tft2, 48, 96, rainbow, 128, 128);
-	disableHSPIScreens();
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	disableVSPIScreens();
 
 	enableScreen8();
-	drawBitmap(tft2, 48, 96, rainbow, 128, 128);
-	disableHSPIScreens();
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	disableVSPIScreens();
 
-	// Switch on TFT LED back light.
+	delay(2000);
 
-	digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
-
-	delay(4000);
+	digitalWrite(TFT_LED_OUT2, LOW); // Output for LCD back light (low is off).
 
 	// Clear screens.
 
 	enableScreen1();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen2();
-	tft1.fillScreen(BLACK);
+	tft.fillScreen(BLACK);
 	disableVSPIScreens();
 
 	enableScreen3();
-	tft1.fillScreen(BLACK);
+	tft.fillScreen(BLACK);
 	disableVSPIScreens();
 
 	enableScreen4();
-	tft1.fillScreen(BLACK);
+	tft.fillScreen(BLACK);
 	disableVSPIScreens();
 
 	enableScreen5();
-	tft2.fillScreen(BLACK);
-	disableHSPIScreens();
+	tft.fillScreen(BLACK);
+	disableVSPIScreens();
 
 	enableScreen6();
-	tft2.fillScreen(BLACK);
-	disableHSPIScreens();
+	tft.fillScreen(BLACK);
+	disableVSPIScreens();
 
 	enableScreen7();
-	tft2.fillScreen(BLACK);
-	disableHSPIScreens();
+	tft.fillScreen(BLACK);
+	disableVSPIScreens();
 
 	enableScreen8();
-	tft2.fillScreen(BLACK);
-	disableHSPIScreens();
+	tft.fillScreen(BLACK);
+	disableVSPIScreens();
 
 	// Initialize SPIFFS.
 
@@ -1006,7 +953,7 @@ void setup() {
 
 		enableScreen1();
 
-		drawBitmap(tft1, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
+		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
 
 		disableVSPIScreens();
 
@@ -1100,29 +1047,29 @@ void setup() {
 
 		enableScreen1();
 
-		tft1.fillRect(39, 60, 183, 109, RED);
-		tft1.drawRect(38, 59, 185, 111, WHITE);
-		tft1.drawRect(37, 58, 187, 113, WHITE);
-		tft1.setFont(&FreeSans9pt7b);
-		tft1.setTextSize(1);
-		tft1.setTextColor(WHITE);
-		tft1.setCursor(50, 78);
-		tft1.print("Access Point Mode");
+		tft.fillRect(39, 60, 183, 109, RED);
+		tft.drawRect(38, 59, 185, 111, WHITE);
+		tft.drawRect(37, 58, 187, 113, WHITE);
+		tft.setFont(&FreeSans9pt7b);
+		tft.setTextSize(1);
+		tft.setTextColor(WHITE);
+		tft.setCursor(50, 78);
+		tft.print("Access Point Mode");
 
-		tft1.setFont();
-		tft1.setTextColor(WHITE);
-		tft1.setCursor(50, 90);
-		tft1.print("Could not connect to WiFi");
-		tft1.setCursor(50, 106);
-		tft1.print("1) Using your mobile phone");
-		tft1.setCursor(50, 118);
-		tft1.print("2) Connect to WiFI Manager");
-		tft1.setCursor(50, 130);
-		tft1.print("3) Browse to 192.168.4.1");
-		tft1.setCursor(50, 142);
-		tft1.print("4) Enter network settings");
-		tft1.setCursor(50, 154);
-		tft1.print("5) Unit will then restart");
+		tft.setFont();
+		tft.setTextColor(WHITE);
+		tft.setCursor(50, 90);
+		tft.print("Could not connect to WiFi");
+		tft.setCursor(50, 106);
+		tft.print("1) Using your mobile phone");
+		tft.setCursor(50, 118);
+		tft.print("2) Connect to WiFI Manager");
+		tft.setCursor(50, 130);
+		tft.print("3) Browse to 192.168.4.1");
+		tft.setCursor(50, 142);
+		tft.print("4) Enter network settings");
+		tft.setCursor(50, 154);
+		tft.print("5) Unit will then restart");
 
 		unsigned long previousMillis = millis();
 		unsigned long interval = 120000;
@@ -1145,9 +1092,7 @@ void setup() {
 
 	}
 
-
 	disableVSPIScreens();
-	disableHSPIScreens();
 
 	enableScreen1();
 
@@ -1157,48 +1102,45 @@ void setup() {
 
 	for (int x = 20; x < 320; x = x + 20) {
 
-		tft1.drawFastVLine(x, 0, 240, BLACK);
+		tft.drawFastVLine(x, 0, 240, BLACK);
 	}
 
 	for (int x = 20; x < 240; x = x + 20) {
 
-		tft1.drawFastHLine(0, x, 320, BLACK);
+		tft.drawFastHLine(0, x, 320, BLACK);
 	}
 
-	digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
-
 	disableVSPIScreens();
-	disableHSPIScreens();
 
 	enableScreen2();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen3();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen4();
-	tft1.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
 	enableScreen5();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
 	enableScreen6();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
 	enableScreen7();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
 	enableScreen8();
-	tft2.fillScreen(WHITE);
-	disableHSPIScreens();
+	tft.fillScreen(WHITE);
+	disableVSPIScreens();
 
-	delay(1000);
+	digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
 
 	// Initialize time and get the time.
 
@@ -1210,40 +1152,40 @@ void setup() {
 
 	currentWeatherLayout();
 
-	forecastWeatherLayoutDayX(tft1, 2);
-	forecastWeatherLayoutDayX(tft1, 3);
-	forecastWeatherLayoutDayX(tft1, 4);
+	forecastWeatherLayoutDayX(tft, 2);
+	forecastWeatherLayoutDayX(tft, 3);
+	forecastWeatherLayoutDayX(tft, 4);
 
-	forecastWeatherLayoutDayX(tft2, 5);
-	forecastWeatherLayoutDayX(tft2, 6);
-	forecastWeatherLayoutDayX(tft2, 7);
-	forecastWeatherLayoutDayX(tft2, 8);
+	forecastWeatherLayoutDayX(tft, 5);
+	forecastWeatherLayoutDayX(tft, 6);
+	forecastWeatherLayoutDayX(tft, 7);
+	forecastWeatherLayoutDayX(tft, 8);
 
 	getWeatherData();
 
 	currentWeatherTemp();
 	currentWeatherDataDisplay();
 
-	forecastDataDisplayTempDayX(tft1, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-	forecastDataDisplayDayX(tft1, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+	forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
+	forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
 
-	forecastDataDisplayTempDayX(tft1, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-	forecastDataDisplayDayX(tft1, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+	forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
+	forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
 
-	forecastDataDisplayTempDayX(tft1, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
-	forecastDataDisplayDayX(tft1, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+	forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
+	forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
 
-	forecastDataDisplayTempDayX(tft2, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-	forecastDataDisplayDayX(tft2, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
+	forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
+	forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
 
-	forecastDataDisplayTempDayX(tft2, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-	forecastDataDisplayDayX(tft2, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
+	forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
+	forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
 
-	forecastDataDisplayTempDayX(tft2, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
-	forecastDataDisplayDayX(tft2, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
+	forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+	forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
 
-	forecastDataDisplayTempDayX(tft2, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
-	forecastDataDisplayDayX(tft2, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+	forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
+	forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
 
 } // Close setup.
 
@@ -1302,26 +1244,26 @@ void loop() {
 
 		// Update forecast weather displays.
 
-		forecastDataDisplayTempDayX(tft1, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-		forecastDataDisplayDayX(tft1, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+		forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
+		forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
 
-		forecastDataDisplayTempDayX(tft1, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-		forecastDataDisplayDayX(tft1, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+		forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
+		forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
 
-		forecastDataDisplayTempDayX(tft1, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
-		forecastDataDisplayDayX(tft1, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+		forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
+		forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
 
-		forecastDataDisplayTempDayX(tft2, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-		forecastDataDisplayDayX(tft2, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
+		forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
+		forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
 
-		forecastDataDisplayTempDayX(tft2, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-		forecastDataDisplayDayX(tft2, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
+		forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
+		forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
 
-		forecastDataDisplayTempDayX(tft2, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
-		forecastDataDisplayDayX(tft2, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
+		forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+		forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
 
-		forecastDataDisplayTempDayX(tft2, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
-		forecastDataDisplayDayX(tft2, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+		forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
+		forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
 
 		intervalTime = 60000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
 		intervalT = millis();
@@ -1348,32 +1290,32 @@ void loop() {
 				if (switchOneToggled == true) {
 
 					enableScreen2();
-					tft1.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft1, 2);
-					forecastDataDisplayDayX(tft1, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 2);
+					forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
 
 					enableScreen3();
-					tft1.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft1, 3);
-					forecastDataDisplayDayX(tft1, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 3);
+					forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
 
 					enableScreen4();
-					tft1.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft1, 4);
-					forecastDataDisplayDayX(tft1, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 4);
+					forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
 
 					switchOneToggled = false;
 				}
 
-				forecastDataDisplayTempDayX(tft1, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-				forecastDataDisplayTempDayX(tft1, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-				forecastDataDisplayTempDayX(tft1, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
+				forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
+				forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
+				forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
 			}
 
-			forecastDataDisplayTempDayX(tft2, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-			forecastDataDisplayTempDayX(tft2, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-			forecastDataDisplayTempDayX(tft2, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
-			forecastDataDisplayTempDayX(tft2, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
+			forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
+			forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
+			forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
 
 		}
 
@@ -1387,32 +1329,32 @@ void loop() {
 				if (switchOneToggled == true) {
 
 					enableScreen2();
-					tft1.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft1, 2);
-					forecastDataDisplayDayX(tft1, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 2);
+					forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
 
 					enableScreen3();
-					tft1.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft1, 3);
-					forecastDataDisplayDayX(tft1, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 3);
+					forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
 
 					enableScreen4();
-					tft1.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft1, 4);
-					forecastDataDisplayDayX(tft1, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 4);
+					forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
 
 					switchOneToggled = false;
 				}
 
-				forecastDataDisplayTempDayX(tft1, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-				forecastDataDisplayTempDayX(tft1, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-				forecastDataDisplayTempDayX(tft1, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
+				forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
+				forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
+				forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
 			}
 
-			forecastDataDisplayTempDayX(tft2, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-			forecastDataDisplayTempDayX(tft2, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-			forecastDataDisplayTempDayX(tft2, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
-			forecastDataDisplayTempDayX(tft2, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
+			forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
+			forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
+			forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
 		}
 
 		intervalTTime = 3000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
@@ -1431,18 +1373,18 @@ void loop() {
 			detachInterrupt(interruptSWITCH1);
 
 			enableScreen2();
-			tft1.fillScreen(WHITE);
-			drawHourlyTempChart(tft1);
+			tft.fillScreen(WHITE);
+			drawHourlyTempChart(tft);
 			disableVSPIScreens();
 
 			enableScreen3();
-			tft1.fillScreen(WHITE);
-			drawHourlyRainChart(tft1);
+			tft.fillScreen(WHITE);
+			drawHourlyRainChart(tft);
 			disableVSPIScreens();
 
 			enableScreen4();
-			tft1.fillScreen(WHITE);
-			drawHourlyPressureChart(tft1);
+			tft.fillScreen(WHITE);
+			drawHourlyPressureChart(tft);
 			disableVSPIScreens();
 
 			switchOneToggled = false;
@@ -1795,23 +1737,23 @@ void currentWeatherLayout() {
 
 	enableScreen1();
 
-	drawBitmap(tft1, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterC, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
+	drawBitmap(tft, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterC, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
 
-	drawBitmap(tft1, SUNRISE_Y, SUNRISE_X, sunrise, SUNRISE_W, SUNRISE_H);
+	drawBitmap(tft, SUNRISE_Y, SUNRISE_X, sunrise, SUNRISE_W, SUNRISE_H);
 
-	drawBitmap(tft1, SUNSET_Y, SUNSET_X, sunset, SUNSET_W, SUNSET_H);
+	drawBitmap(tft, SUNSET_Y, SUNSET_X, sunset, SUNSET_W, SUNSET_H);
 
-	drawBitmap(tft1, WINDSPEEDICON_Y, WINDSPEEDICON_X, windSpeed, WINDSPEEDICON_W, WINDSPEEDICON_H);
+	drawBitmap(tft, WINDSPEEDICON_Y, WINDSPEEDICON_X, windSpeed, WINDSPEEDICON_W, WINDSPEEDICON_H);
 
-	drawBitmap(tft1, WINDDIRECTIONICON_Y, WINDDIRECTIONICON_X, windDirection, WINDDIRECTIONICON_W, WINDDIRECTIONICON_H);
+	drawBitmap(tft, WINDDIRECTIONICON_Y, WINDDIRECTIONICON_X, windDirection, WINDDIRECTIONICON_W, WINDDIRECTIONICON_H);
 
-	drawBitmap(tft1, PRESSUREICON_Y, PRESSUREICON_X, pressure, PRESSUREICON_W, PRESSUREICON_H);
+	drawBitmap(tft, PRESSUREICON_Y, PRESSUREICON_X, pressure, PRESSUREICON_W, PRESSUREICON_H);
 
-	drawBitmap(tft1, RAINSNOWICON_Y, RAINSNOWICON_X, rainSnowFall, RAINSNOWICON_W, RAINSNOWICON_H);
+	drawBitmap(tft, RAINSNOWICON_Y, RAINSNOWICON_X, rainSnowFall, RAINSNOWICON_W, RAINSNOWICON_H);
 
-	drawBitmap(tft1, UVICON_Y, UVICON_X, uv, UVICON_W, UVICON_H);
+	drawBitmap(tft, UVICON_Y, UVICON_X, uv, UVICON_W, UVICON_H);
 
-	drawBitmap(tft1, HUMIDITYICON_Y, HUMIDITYICON_X, humidity, HUMIDITYICON_W, HUMIDITYICON_H);
+	drawBitmap(tft, HUMIDITYICON_Y, HUMIDITYICON_X, humidity, HUMIDITYICON_W, HUMIDITYICON_H);
 
 	disableVSPIScreens();
 
@@ -1859,7 +1801,7 @@ void currentWeatherDataDisplay() {
 
 	enableScreen1();
 
-	currentWeatherImage(tft1, currentWeatherNow, dayNight);
+	currentWeatherImage(tft, currentWeatherNow, dayNight);
 
 	disableVSPIScreens();
 
@@ -1868,117 +1810,117 @@ void currentWeatherDataDisplay() {
 
 	enableScreen1();
 
-	tft1.fillRect(WINDSPEEDVALUE_X, WINDSPEEDVALUE_Y - 32, 50, 150, WHITE);		// Cover vertical values column 1
-	tft1.fillRect(WINDDIRECTION_X, WINDSPEEDVALUE_Y - 32, 50, 150, WHITE);		// Cover vertical values column 2
-	tft1.fillRect(TEMPERATUREVALUE_X, 30, 110, 40, WHITE);
+	tft.fillRect(WINDSPEEDVALUE_X, WINDSPEEDVALUE_Y - 32, 50, 150, WHITE);		// Cover vertical values column 1
+	tft.fillRect(WINDDIRECTION_X, WINDSPEEDVALUE_Y - 32, 50, 150, WHITE);		// Cover vertical values column 2
+	tft.fillRect(TEMPERATUREVALUE_X, 30, 110, 40, WHITE);
 
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setCursor(TEMPERATUREVALUE_X, TEMPERATUREVALUE_Y);
-	tft1.print(tempTemp);
-	tft1.setCursor(FEELSLIKETEMPERATUREICON_X, TEMPERATUREVALUE_Y);
-	tft1.print(tempFeelsLikeTemp);
-	tft1.setFont();
-	tft1.setTextSize(0);
-	tft1.setCursor(FEELSLIKETEMPERATUREICON_X + 5, TEMPERATUREVALUE_Y + 5);
-	tft1.print("Feels Like");
+	tft.setTextColor(BLACK, WHITE);
+	tft.setFont(&FreeSans9pt7b);
+	tft.setCursor(TEMPERATUREVALUE_X, TEMPERATUREVALUE_Y);
+	tft.print(tempTemp);
+	tft.setCursor(FEELSLIKETEMPERATUREICON_X, TEMPERATUREVALUE_Y);
+	tft.print(tempFeelsLikeTemp);
+	tft.setFont();
+	tft.setTextSize(0);
+	tft.setCursor(FEELSLIKETEMPERATUREICON_X + 5, TEMPERATUREVALUE_Y + 5);
+	tft.print("Feels Like");
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setCursor(PRESSUREVALUE_X, PRESSUREVALUE_Y);
-	tft1.print(pressureNow);
-	tft1.setFont();
-	tft1.setTextSize(0);
+	tft.setFont(&FreeSans9pt7b);
+	tft.setCursor(PRESSUREVALUE_X, PRESSUREVALUE_Y);
+	tft.print(pressureNow);
+	tft.setFont();
+	tft.setTextSize(0);
 
 	if (pressureNow > 999) {
 
-		tft1.setCursor(PRESSUREVALUE_X + 5, PRESSUREVALUE_Y + 5);
-		tft1.print("hPa");
+		tft.setCursor(PRESSUREVALUE_X + 5, PRESSUREVALUE_Y + 5);
+		tft.print("hPa");
 	}
 
 	else {
-		tft1.setCursor(PRESSUREVALUE_X + 2, PRESSUREVALUE_Y + 5);
-		tft1.print("hPa");
+		tft.setCursor(PRESSUREVALUE_X + 2, PRESSUREVALUE_Y + 5);
+		tft.print("hPa");
 	}
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setTextSize(1);
-	tft1.setCursor(HUMIDITYVALUE_X, HUMIDITYVALUE_Y);
-	tft1.print(tempHumidity);
-	tft1.print("%");
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setCursor(HUMIDITYVALUE_X, HUMIDITYVALUE_Y);
+	tft.print(tempHumidity);
+	tft.print("%");
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setCursor(WINDSPEEDVALUE_X, WINDSPEEDVALUE_Y);
-	tft1.print(windSpeedNow);
-	tft1.setFont();
-	tft1.setTextSize(0);
+	tft.setFont(&FreeSans9pt7b);
+	tft.setCursor(WINDSPEEDVALUE_X, WINDSPEEDVALUE_Y);
+	tft.print(windSpeedNow);
+	tft.setFont();
+	tft.setTextSize(0);
 
 	if (windSpeedNow > 19.9) {
 
-		tft1.setCursor(WINDSPEEDVALUE_X + 2, WINDSPEEDVALUE_Y + 5);
-		tft1.print("m/ps");
+		tft.setCursor(WINDSPEEDVALUE_X + 2, WINDSPEEDVALUE_Y + 5);
+		tft.print("m/ps");
 	}
 
 	else if (windSpeedNow > 9.9) {
 
-		tft1.setCursor(WINDSPEEDVALUE_X + 5, WINDSPEEDVALUE_Y + 5);
-		tft1.print("m/ps");
+		tft.setCursor(WINDSPEEDVALUE_X + 5, WINDSPEEDVALUE_Y + 5);
+		tft.print("m/ps");
 	}
 
 	else if (windSpeedNow > 1.9) {
 
-		tft1.setCursor(WINDSPEEDVALUE_X + 2, WINDSPEEDVALUE_Y + 5);
-		tft1.print("m/ps");
+		tft.setCursor(WINDSPEEDVALUE_X + 2, WINDSPEEDVALUE_Y + 5);
+		tft.print("m/ps");
 	}
 
 	else if (windSpeedNow < 1) {
-		tft1.setCursor(WINDSPEEDVALUE_X + 2, WINDSPEEDVALUE_Y + 5);
-		tft1.print("m/ps");
+		tft.setCursor(WINDSPEEDVALUE_X + 2, WINDSPEEDVALUE_Y + 5);
+		tft.print("m/ps");
 	}
 
 	else {
-		tft1.setCursor(WINDSPEEDVALUE_X + 5, WINDSPEEDVALUE_Y + 5);
-		tft1.print("m/ps");
+		tft.setCursor(WINDSPEEDVALUE_X + 5, WINDSPEEDVALUE_Y + 5);
+		tft.print("m/ps");
 	}
 
 	heading = getHeadingReturn(windDirectionNow);
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setTextSize(1);
-	tft1.setCursor(WINDDIRECTION_X, WINDDIRECTION_Y);
-	tft1.print(headingArray[heading]);
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setCursor(WINDDIRECTION_X, WINDDIRECTION_Y);
+	tft.print(headingArray[heading]);
 
-	tft1.setCursor(UVVALUE_X, UVVALUE_Y);
-	tft1.print(uvIndexNow);
-	tft1.setCursor(RAINSNOWVALUE_X, RAINSNOWVALUE_Y);
-	tft1.print(rainLevelNow);
-	tft1.setFont();
-	tft1.setTextSize(0);
+	tft.setCursor(UVVALUE_X, UVVALUE_Y);
+	tft.print(uvIndexNow);
+	tft.setCursor(RAINSNOWVALUE_X, RAINSNOWVALUE_Y);
+	tft.print(rainLevelNow);
+	tft.setFont();
+	tft.setTextSize(0);
 
 	if (rainLevelNow > 19.9) {
 
-		tft1.setCursor(RAINSNOWVALUE_X + 2, RAINSNOWVALUE_Y + 5);
-		tft1.print("mm");
+		tft.setCursor(RAINSNOWVALUE_X + 2, RAINSNOWVALUE_Y + 5);
+		tft.print("mm");
 	}
 
 	else if (rainLevelNow > 9.9) {
 
-		tft1.setCursor(RAINSNOWVALUE_X + 5, RAINSNOWVALUE_Y + 5);
-		tft1.print("mm");
+		tft.setCursor(RAINSNOWVALUE_X + 5, RAINSNOWVALUE_Y + 5);
+		tft.print("mm");
 	}
 
 	else if (rainLevelNow > 1.9) {
 
-		tft1.setCursor(RAINSNOWVALUE_X + 2, RAINSNOWVALUE_Y + 5);
-		tft1.print("mm");
+		tft.setCursor(RAINSNOWVALUE_X + 2, RAINSNOWVALUE_Y + 5);
+		tft.print("mm");
 	}
 
 	else if (rainLevelNow < 1) {
-		tft1.setCursor(RAINSNOWVALUE_X + 2, RAINSNOWVALUE_Y + 5);
-		tft1.print("mm");
+		tft.setCursor(RAINSNOWVALUE_X + 2, RAINSNOWVALUE_Y + 5);
+		tft.print("mm");
 	}
 
 	else {
-		tft1.setCursor(RAINSNOWVALUE_X + 5, RAINSNOWVALUE_Y + 5);
-		tft1.print("mm");
+		tft.setCursor(RAINSNOWVALUE_X + 5, RAINSNOWVALUE_Y + 5);
+		tft.print("mm");
 	}
 
 	// Extract sunrise time.
@@ -1997,11 +1939,11 @@ void currentWeatherDataDisplay() {
 	Serial.printf("%s\n", buf);
 	Serial.println("");
 
-	tft1.setFont();
-	tft1.setTextSize(0);
-	tft1.setTextColor(BLACK);
-	tft1.setCursor(11, 215);
-	tft1.printf("%s\n", buf);
+	tft.setFont();
+	tft.setTextSize(0);
+	tft.setTextColor(BLACK);
+	tft.setCursor(11, 215);
+	tft.printf("%s\n", buf);
 
 	// Extract sunset time.
 
@@ -2014,13 +1956,13 @@ void currentWeatherDataDisplay() {
 	Serial.printf("%s\n", buf);
 	Serial.println("");
 
-	tft1.setFont();
-	tft1.setTextSize(0);
-	tft1.setTextColor(BLACK);
-	tft1.setCursor(71, 215);
-	tft1.printf("%s\n", buf);
+	tft.setFont();
+	tft.setTextSize(0);
+	tft.setTextColor(BLACK);
+	tft.setCursor(71, 215);
+	tft.printf("%s\n", buf);
 
-	tft1.setFont();
+	tft.setFont();
 
 	disableVSPIScreens();
 
@@ -2034,17 +1976,17 @@ void currentWeatherTemp() {
 
 	if (flagTempDisplayChange == false) {
 
-		tft1.fillRect(0, 0, 320, 25, WHITE);
+		tft.fillRect(0, 0, 320, 25, WHITE);
 
-		tft1.setFont(&FreeSans9pt7b);
-		tft1.setTextSize(1);
-		tft1.setTextColor(BLACK, WHITE);
-		tft1.setCursor(5, 20);
-		tft1.println("Current Weather");
-		tft1.setCursor(150, 20);			// Remove later
-		tft1.print("Swt 1: ");				// Remove later
-		tft1.print(switchOneState);			// Remove later
-		tft1.setFont();
+		tft.setFont(&FreeSans9pt7b);
+		tft.setTextSize(1);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(5, 20);
+		tft.println("Current Weather");
+		tft.setCursor(150, 20);			// Remove later
+		tft.print("Swt 1: ");				// Remove later
+		tft.print(switchOneState);			// Remove later
+		tft.setFont();
 
 	}
 
@@ -2052,23 +1994,22 @@ void currentWeatherTemp() {
 
 		enableScreen1();
 
-		tft1.fillRect(0, 0, 320, 25, WHITE);
+		tft.fillRect(0, 0, 320, 25, WHITE);
 
-		tft1.setFont(&FreeSans9pt7b);
-		tft1.setTextSize(1);
-		tft1.setTextColor(BLACK, WHITE);
-		tft1.setCursor(5, 20);
-		tft1.print(weatherDesCurrent);
-		tft1.setCursor(150, 20);			// Remove later
-		tft1.print("Swt 1: ");				// Remove later
-		tft1.print(switchOneState);			// Remove later
-		tft1.setFont();
+		tft.setFont(&FreeSans9pt7b);
+		tft.setTextSize(1);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(5, 20);
+		tft.print(weatherDesCurrent);
+		tft.setCursor(150, 20);			// Remove later
+		tft.print("Swt 1: ");				// Remove later
+		tft.print(switchOneState);			// Remove later
+		tft.setFont();
 
 	}
 
 	disableVSPIScreens();
-	disableHSPIScreens();
-
+	
 } // Close function.
 
 /*-----------------------------------------------------------------*/
@@ -2136,7 +2077,6 @@ void forecastWeatherLayoutDayX(Adafruit_ILI9341& tft, byte screen) {
 	drawBitmap(tft, HUMIDITYICON_Y, HUMIDITYICON_X, humidity, HUMIDITYICON_W, HUMIDITYICON_H);
 
 	disableVSPIScreens();
-	disableHSPIScreens();
 
 } // Close function.
 
@@ -2360,7 +2300,6 @@ void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	//tft.println(buf);
 
 	disableVSPIScreens();
-	disableHSPIScreens();
 
 } // Close function.
 
@@ -2491,7 +2430,6 @@ void forecastDataDisplayTempDayX(Adafruit_ILI9341& tft, byte screen, unsigned lo
 	}
 
 	disableVSPIScreens();
-	disableHSPIScreens();
 
 } // Close function.
 
@@ -2505,29 +2443,29 @@ void wiFiTitle() {
 
 	enableScreen1();
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setTextSize(1);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setCursor(13, 26);
-	tft1.println("Setting up WiFi");
-	tft1.setFont();
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(13, 26);
+	tft.println("Setting up WiFi");
+	tft.setFont();
 
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setFont();
-	tft1.setCursor(23, 50);
-	tft1.print("WiFi Status: ");
-	tft1.setCursor(23, 65);
-	tft1.print("SSID: ");
-	tft1.setCursor(23, 80);
-	tft1.print("IP Address: ");
-	tft1.setCursor(23, 95);
-	tft1.print("DNS Address: ");
-	tft1.setCursor(23, 110);
-	tft1.print("Gateway Address: ");
-	tft1.setCursor(23, 125);
-	tft1.print("Signal Strenght: ");
-	tft1.setCursor(23, 140);
-	tft1.print("Time Server: ");
+	tft.setTextColor(BLACK, WHITE);
+	tft.setFont();
+	tft.setCursor(23, 50);
+	tft.print("WiFi Status: ");
+	tft.setCursor(23, 65);
+	tft.print("SSID: ");
+	tft.setCursor(23, 80);
+	tft.print("IP Address: ");
+	tft.setCursor(23, 95);
+	tft.print("DNS Address: ");
+	tft.setCursor(23, 110);
+	tft.print("Gateway Address: ");
+	tft.setCursor(23, 125);
+	tft.print("Signal Strenght: ");
+	tft.setCursor(23, 140);
+	tft.print("Time Server: ");
 
 	disableVSPIScreens();
 
@@ -2537,60 +2475,60 @@ void wiFiTitle() {
 
 void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setTextSize(1);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setCursor(5, 20);
-	tft1.print("Temperature");
-	tft1.setFont();
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(5, 20);
+	tft.print("Temperature");
+	tft.setFont();
 
-	drawBitmap(tft1, 40, 228, temperatureLrgBlk, 64, 64);
+	drawBitmap(tft, 40, 228, temperatureLrgBlk, 64, 64);
 
-	tft1.setTextSize(1);
-	tft1.setTextColor(GREY, WHITE);
-	tft1.setCursor(60, 228);
-	tft1.println("Current + hr");
-	tft1.setFont();
+	tft.setTextSize(1);
+	tft.setTextColor(GREY, WHITE);
+	tft.setCursor(60, 228);
+	tft.println("Current + hr");
+	tft.setFont();
 
-	tft1.setFont(&FreeSans12pt7b);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setCursor(215, 135);
-	tft1.println("Current");
+	tft.setFont(&FreeSans12pt7b);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(215, 135);
+	tft.println("Current");
 
 	if (temperatureHr1 > 9) {
 
-		tft1.setFont(&FreeSans12pt7b);
-		tft1.setTextColor(BLACK, WHITE);
-		tft1.setCursor(240, 160);
-		tft1.println(temperatureHr1);
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(240, 160);
+		tft.println(temperatureHr1);
 	}
 
 	else if (temperatureHr1 >= 0) {
 
-		tft1.setFont(&FreeSans12pt7b);
-		tft1.setTextColor(BLACK, WHITE);
-		tft1.setCursor(247, 160);
-		tft1.println(temperatureHr1);
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(247, 160);
+		tft.println(temperatureHr1);
 	}
 
 	else if (temperatureHr1 <= -10) {
 
-		tft1.setFont(&FreeSans12pt7b);
-		tft1.setTextColor(BLACK, WHITE);
-		tft1.setCursor(235, 160);
-		tft1.println(temperatureHr1);
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(235, 160);
+		tft.println(temperatureHr1);
 	}
 
 
 	else if (temperatureHr1 <= 0) {
 
-		tft1.setFont(&FreeSans12pt7b);
-		tft1.setTextColor(BLACK, WHITE);
-		tft1.setCursor(243, 160);
-		tft1.println(temperatureHr1);
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(243, 160);
+		tft.println(temperatureHr1);
 	}
 
-	tft1.setFont();
+	tft.setFont();
 
 	int loVal = -30;
 	int hiVal = 45;
@@ -2615,14 +2553,14 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 	}
 
 
-	drawBarChartV1(tft1, 1, 20, 210, 10, 170, loVal, hiVal, 5, temperatureHr1, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
-	drawBarChartV1(tft1, 1, 40, 210, 10, 170, loVal, hiVal, 5, temperatureHr2, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
-	drawBarChartV1(tft1, 1, 60, 210, 10, 170, loVal, hiVal, 5, temperatureHr3, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
-	drawBarChartV1(tft1, 1, 80, 210, 10, 170, loVal, hiVal, 5, temperatureHr4, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
-	drawBarChartV1(tft1, 1, 100, 210, 10, 170, loVal, hiVal, 5, temperatureHr5, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
-	drawBarChartV1(tft1, 1, 120, 210, 10, 170, loVal, hiVal, 5, temperatureHr6, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
-	drawBarChartV1(tft1, 1, 140, 210, 10, 170, loVal, hiVal, 5, temperatureHr7, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
-	drawBarChartV2(tft1, 1, 160, 210, 10, 170, loVal, hiVal, 5, temperatureHr8, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, loVal, hiVal, 5, temperatureHr1, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, loVal, hiVal, 5, temperatureHr2, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, loVal, hiVal, 5, temperatureHr3, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, loVal, hiVal, 5, temperatureHr4, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, loVal, hiVal, 5, temperatureHr5, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, loVal, hiVal, 5, temperatureHr6, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, loVal, hiVal, 5, temperatureHr7, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, loVal, hiVal, 5, temperatureHr8, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
 
 	disableVSPIScreens();
 
@@ -2632,41 +2570,41 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 
-	tft1.setFont(&FreeSans9pt7b);
-	tft1.setTextSize(1);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setCursor(5, 20);
-	tft1.print("Rain Fall");
-	tft1.setFont();
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(5, 20);
+	tft.print("Rain Fall");
+	tft.setFont();
 
-	drawBitmap(tft1, 40, 228, rainFallLrgBlk, 64, 64);
+	drawBitmap(tft, 40, 228, rainFallLrgBlk, 64, 64);
 
-	tft1.setTextSize(1);
-	tft1.setTextColor(GREY, WHITE);
-	tft1.setCursor(202, 206);
-	tft1.println("mm");
-	tft1.setFont();
+	tft.setTextSize(1);
+	tft.setTextColor(GREY, WHITE);
+	tft.setCursor(202, 206);
+	tft.println("mm");
+	tft.setFont();
 
-	tft1.setTextSize(1);
-	tft1.setTextColor(GREY, WHITE);
-	tft1.setCursor(60, 228);
-	tft1.println("Current + hr");
-	tft1.setFont();
+	tft.setTextSize(1);
+	tft.setTextColor(GREY, WHITE);
+	tft.setCursor(60, 228);
+	tft.println("Current + hr");
+	tft.setFont();
 
 	if (rainFallHr1 > 100) {
 
 		rainFallHr1 = 100;
 	}
 
-	tft1.setFont(&FreeSans12pt7b);
-	tft1.setTextColor(BLACK, WHITE);
-	tft1.setCursor(235, 135);
-	tft1.println(rainFallHr1);
-	tft1.setCursor(240, 160);
-	tft1.println("mm");
-	tft1.setFont();
+	tft.setFont(&FreeSans12pt7b);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(235, 135);
+	tft.println(rainFallHr1);
+	tft.setCursor(240, 160);
+	tft.println("mm");
+	tft.setFont();
 
-	tft1.setTextSize(0);
+	tft.setTextSize(0);
 
 	// Convert Double to Int
 
@@ -2681,14 +2619,14 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 
 	// Insert scale change including intervals
 
-	drawBarChartV1(tft1, 1, 20, 210, 10, 170, 0, 10, 1, rainFallHr1Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
-	drawBarChartV1(tft1, 1, 40, 210, 10, 170, 0, 10, 1, rainFallHr2Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
-	drawBarChartV1(tft1, 1, 60, 210, 10, 170, 0, 10, 1, rainFallHr3Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
-	drawBarChartV1(tft1, 1, 80, 210, 10, 170, 0, 10, 1, rainFallHr4Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
-	drawBarChartV1(tft1, 1, 100, 210, 10, 170, 0, 10, 1, rainFallHr5Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
-	drawBarChartV1(tft1, 1, 120, 210, 10, 170, 0, 10, 1, rainFallHr6Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
-	drawBarChartV1(tft1, 1, 140, 210, 10, 170, 0, 10, 1, rainFallHr7Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
-	drawBarChartV2(tft1, 1, 160, 210, 10, 170, 0, 10, 1, rainFallHr8Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, 10, 1, rainFallHr1Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, 10, 1, rainFallHr2Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, 10, 1, rainFallHr3Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, 10, 1, rainFallHr4Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, 10, 1, rainFallHr5Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, 10, 1, rainFallHr6Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, 10, 1, rainFallHr7Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, 10, 1, rainFallHr8Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
 
 	disableVSPIScreens();
 
@@ -2864,14 +2802,14 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 		hiVal = 1000;
 	}
 
-	drawBarChartV1(tft1, 4, 20, 210, 10, 170, loVal, hiVal, 20, pressureHr1, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
-	drawBarChartV1(tft1, 4, 40, 210, 10, 170, loVal, hiVal, 20, pressureHr2, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
-	drawBarChartV1(tft1, 4, 60, 210, 10, 170, loVal, hiVal, 20, pressureHr3, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
-	drawBarChartV1(tft1, 4, 80, 210, 10, 170, loVal, hiVal, 20, pressureHr4, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
-	drawBarChartV1(tft1, 4, 100, 210, 10, 170, loVal, hiVal, 20, pressureHr5, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
-	drawBarChartV1(tft1, 4, 120, 210, 10, 170, loVal, hiVal, 20, pressureHr6, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
-	drawBarChartV1(tft1, 4, 140, 210, 10, 170, loVal, hiVal, 20, pressureHr7, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
-	drawBarChartV2(tft1, 4, 160, 210, 10, 170, loVal, hiVal, 20, pressureHr8, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 4, 20, 210, 10, 170, loVal, hiVal, 20, pressureHr1, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
+	drawBarChartV1(tft, 4, 40, 210, 10, 170, loVal, hiVal, 20, pressureHr2, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
+	drawBarChartV1(tft, 4, 60, 210, 10, 170, loVal, hiVal, 20, pressureHr3, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
+	drawBarChartV1(tft, 4, 80, 210, 10, 170, loVal, hiVal, 20, pressureHr4, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
+	drawBarChartV1(tft, 4, 100, 210, 10, 170, loVal, hiVal, 20, pressureHr5, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
+	drawBarChartV1(tft, 4, 120, 210, 10, 170, loVal, hiVal, 20, pressureHr6, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
+	drawBarChartV1(tft, 4, 140, 210, 10, 170, loVal, hiVal, 20, pressureHr7, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
+	drawBarChartV2(tft, 4, 160, 210, 10, 170, loVal, hiVal, 20, pressureHr8, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
 
 	disableVSPIScreens();
 
@@ -2886,7 +2824,7 @@ void drawBorder() {
 	// Draw layout borders.
 
 	enableScreen1();
-	tft1.drawRect(FRAME1_X, FRAME1_Y, FRAME1_W, FRAME1_H, WHITE);
+	tft.drawRect(FRAME1_X, FRAME1_Y, FRAME1_W, FRAME1_H, WHITE);
 	disableVSPIScreens();
 	//tft.drawRect(FRAME2_X, FRAME2_Y, FRAME2_W, FRAME2_H, WHITE);
 
@@ -2900,8 +2838,8 @@ void drawBlackBox() {
 
 	// Clear screen by using a black box.
 	enableScreen1();
-	tft1.fillRect(FRAME2_X + 1, FRAME2_Y + 25, FRAME2_W - 2, FRAME2_H - 40, BLACK);		// This covers only the graphs and charts, not the system icons to save refresh flicker.
-	tft1.fillRect(FRAME2_X + 1, FRAME2_Y + 1, FRAME2_W - 90, FRAME2_H - 200, BLACK);		// Ths covers the title text per page
+	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 25, FRAME2_W - 2, FRAME2_H - 40, BLACK);		// This covers only the graphs and charts, not the system icons to save refresh flicker.
+	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 1, FRAME2_W - 90, FRAME2_H - 200, BLACK);		// Ths covers the title text per page
 	disableVSPIScreens();
 
 } // Close function.
