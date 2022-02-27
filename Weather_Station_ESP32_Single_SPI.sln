@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32126.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Weather_Station_ESP32_Single_SPI", "Weather_Station_ESP32_Single_SPI.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_GFX_Library", "Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems", "{881A77B1-A659-403D-90BD-8C62AC465DDA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_ILI9341", "Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems", "{AEB7C2C1-0259-43A9-929F-6266D05D5BD3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AsyncTCP-master", "Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems", "{833CCC45-1D00-4F21-98FB-52202FA56FE0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESP32Time", "Libraries\ESP32Time\ESP32Time.vcxitems", "{171F0EBE-EF6D-4954-8742-CD3D343FB5CD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESPAsyncWebServer-master", "Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems", "{0EA0E7EE-91D1-4809-88EF-C98277904EBA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPClient", "Libraries\HTTPClient\HTTPClient.vcxitems", "{96CB0237-19D5-4FF6-B6B1-8A95FD4A7C42}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI", "Libraries\SPI\SPI.vcxitems", "{2C9A4B19-5D7E-4023-8298-675BA4F98886}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPIFFS", "Libraries\SPIFFS\SPIFFS.vcxitems", "{729F0289-2FAF-4241-A909-364A74250827}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WiFi", "Libraries\WiFi\WiFi.vcxitems", "{FEFA8805-CF2E-4CAD-BEF7-05012A942E94}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{0ea0e7ee-91d1-4809-88ef-c98277904eba}*SharedItemsImports = 9
+		Libraries\ESP32Time\ESP32Time.vcxitems*{171f0ebe-ef6d-4954-8742-cd3d343fb5cd}*SharedItemsImports = 9
+		Libraries\SPI\SPI.vcxitems*{2c9a4b19-5d7e-4023-8298-675ba4f98886}*SharedItemsImports = 9
+		Libraries\SPIFFS\SPIFFS.vcxitems*{729f0289-2faf-4241-a909-364a74250827}*SharedItemsImports = 9
+		Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems*{833ccc45-1d00-4f21-98fb-52202fa56fe0}*SharedItemsImports = 9
+		Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{881a77b1-a659-403d-90bd-8c62ac465dda}*SharedItemsImports = 9
+		Libraries\HTTPClient\HTTPClient.vcxitems*{96cb0237-19d5-4ff6-b6b1-8a95fd4a7c42}*SharedItemsImports = 9
+		Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems*{aeb7c2c1-0259-43a9-929f-6266d05d5bd3}*SharedItemsImports = 9
+		Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ESP32Time\ESP32Time.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\HTTPClient\HTTPClient.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPIFFS\SPIFFS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\WiFi\WiFi.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\WiFi\WiFi.vcxitems*{fefa8805-cf2e-4cad-bef7-05012a942e94}*SharedItemsImports = 9
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4266178D-9EAB-44EA-991C-9F28BEDFCA64}
+	EndGlobalSection
+EndGlobal
