@@ -5,11 +5,11 @@
 #include "tftControl.h"		// Enable / disable TFT screens
 
 #define VSPI_CS0	36 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes.
-#define VSPI_CS1    5  // Screen one chip select
-#define VSPI_CS2    21 // Screen two chip select
-#define VSPI_CS3    16 // Screen three chip select
-#define VSPI_CS4    17 // Screen four chip select
-#define VSPI_CS5    15 // Screen five chip select.
+#define VSPI_CS1    5  // Screen one chip select.
+#define VSPI_CS2    17  // 21 // Screen two chip select.
+#define VSPI_CS3    16 // 16 // Screen three chip select.
+#define VSPI_CS4    15 // 17 // Screen four chip select.
+#define VSPI_CS5    26 // 15 // Screen five chip select.
 #define VSPI_CS6    25 // Screen six chip select.
 #define VSPI_CS7    33 // Screen seven chip select.
 #define VSPI_CS8    32 // Screen eight chip select.

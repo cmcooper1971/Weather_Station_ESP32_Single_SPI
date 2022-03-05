@@ -6,6 +6,7 @@
 
 // Libraries.
 
+
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
@@ -16,6 +17,7 @@
 #include <HTTPClient.h>
 #include <SPIFFS.h>
 #include <ArduinoJSON.h>
+#include <Adafruit_MCP23X08.h>
 
 #include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
@@ -45,33 +47,41 @@
 #define VSPI_MOSI   23 // MOSI
 #define VSPI_CLK    18 // SCK
 #define VSPI_DC     4  // DC
-#define VSPI_RST    22 // RST
+#define VSPI_RST    13 // 22 // RST							
 
 #define VSPI_CS0	36 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes.
 #define VSPI_CS1    5  // Screen one chip select.
-#define VSPI_CS2    21 // Screen two chip select.
-#define VSPI_CS3    16 // Screen three chip select.
-#define VSPI_CS4    17 // Screen four chip select.
-#define VSPI_CS5    15 // Screen five chip select.
+#define VSPI_CS2    17  // 21 // Screen two chip select.
+#define VSPI_CS3    16 // 16 // Screen three chip select.
+#define VSPI_CS4    15 // 17 // Screen four chip select.
+#define VSPI_CS5    26 // 15 // Screen five chip select.
 #define VSPI_CS6    25 // Screen six chip select.
 #define VSPI_CS7    33 // Screen seven chip select.
 #define VSPI_CS8    32 // Screen eight chip select.
 
-#define TFT_LED_OUT1	0 // LED backlight output pin.
+#define TFT_LED_OUT1	0 // LED backlight output pin.   
 #define TFT_LED_OUT2	2 // LED backlight output pin.
 
 #define interruptSWITCH1	1
+#define interruptSWITCH2	3
 
-// Configure switch
+// Configure switchs
 
 boolean switchOneState = false;
 boolean switchOneToggled = false;
+
+boolean switchTwoState = true;
+boolean switchTwoToggled = false;
 
 // VSPI Class (default).
 Adafruit_ILI9341 tft = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_RST); // CS0 is a dummy pin
 
 //Software defined SPI.
 //Adafruit_ILI9341 tft1 = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_MOSI, VSPI_CLK, VSPI_RST, VSPI_MISO); // CS0 is a dummy pin 
+
+// MCP23008
+
+Adafruit_MCP23X08 mcp;
 
 // Configure time settings.
 
@@ -703,6 +713,8 @@ void setup() {
 	//Serial.begin(115200);
 	//delay(100);
 
+	mcp.begin_I2C();      // use default address 0
+
 	// Set pin modes.
 
 	pinMode(TFT_LED_OUT1, OUTPUT); // Enable TFT LED backlight control.
@@ -718,10 +730,71 @@ void setup() {
 	pinMode(VSPI_CS8, OUTPUT); //VSPI CS
 
 	pinMode(interruptSWITCH1, INPUT_PULLUP); //Interupt
+	pinMode(interruptSWITCH2, INPUT_PULLUP); //Interupt
 
 	// Configure interrupt.
 
 	attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
+	attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
+
+	pinMode(27, OUTPUT);
+
+	digitalWrite(27, LOW);
+	delay(10);
+	digitalWrite(27, HIGH);
+
+	mcp.pinMode(0, OUTPUT);
+	mcp.pinMode(1, OUTPUT);
+	mcp.pinMode(2, OUTPUT);
+	mcp.pinMode(3, OUTPUT);
+	mcp.pinMode(4, OUTPUT);
+	mcp.pinMode(5, OUTPUT);
+	mcp.pinMode(6, OUTPUT);
+	mcp.pinMode(7, OUTPUT);
+
+	mcp.digitalWrite(0, LOW);
+	mcp.digitalWrite(1, LOW);
+	mcp.digitalWrite(2, LOW);
+	mcp.digitalWrite(3, LOW);
+	mcp.digitalWrite(4, LOW);
+	mcp.digitalWrite(5, LOW);
+	mcp.digitalWrite(6, LOW);
+	mcp.digitalWrite(7, LOW);
+
+	delay(200);
+	mcp.digitalWrite(0, HIGH);
+	delay(200);
+	mcp.digitalWrite(1, HIGH);
+	delay(200);
+	mcp.digitalWrite(2, HIGH);
+	delay(200);
+	mcp.digitalWrite(3, HIGH);
+	delay(200);
+	mcp.digitalWrite(4, HIGH);
+	delay(200);
+	mcp.digitalWrite(5, HIGH);
+	delay(200);
+	mcp.digitalWrite(6, HIGH);
+	delay(200);
+	mcp.digitalWrite(7, HIGH);
+
+	delay(200);
+	mcp.digitalWrite(0, LOW);
+	delay(200);
+	mcp.digitalWrite(1, LOW);
+	delay(200);
+	mcp.digitalWrite(2, LOW);
+	delay(200);
+	mcp.digitalWrite(3, LOW);
+	delay(200);
+	mcp.digitalWrite(4, LOW);
+	delay(200);
+	mcp.digitalWrite(5, LOW);
+	delay(200);
+	mcp.digitalWrite(6, LOW);
+	delay(200);
+	mcp.digitalWrite(7, LOW);
+	delay(200);
 
 	// Switch on TFT LED back light.
 
@@ -1141,6 +1214,14 @@ void setup() {
 	disableVSPIScreens();
 
 	digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
+	mcp.digitalWrite(0, HIGH);
+	mcp.digitalWrite(1, HIGH);
+	mcp.digitalWrite(2, HIGH);
+	mcp.digitalWrite(3, HIGH);
+	mcp.digitalWrite(4, HIGH);
+	mcp.digitalWrite(5, HIGH);
+	mcp.digitalWrite(6, HIGH);
+	mcp.digitalWrite(7, HIGH);
 
 	// Initialize time and get the time.
 
@@ -1210,6 +1291,33 @@ ICACHE_RAM_ATTR void displayToggle() {
 			switchOneState = false;
 			switchOneToggled = true;
 			intervalTTime = 0;
+		}
+	}
+
+	last_interrupt_time = interrupt_time;
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+ICACHE_RAM_ATTR void displayBackLight() {
+
+	static unsigned long  last_interrupt_time = 0;                  // Function to solve debounce
+	unsigned long         interrupt_time = millis();
+
+	if (interrupt_time - last_interrupt_time > 150)
+	{
+		if (switchTwoState == false) {
+
+			switchTwoState = true;
+			switchTwoToggled = true;
+		}
+
+		else if (switchTwoState == true) {
+
+			switchTwoState = false;
+			switchTwoToggled = true;
+
 		}
 	}
 
@@ -1390,6 +1498,56 @@ void loop() {
 			switchOneToggled = false;
 
 			attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
+
+		}
+
+	}
+
+	if (switchTwoState == true) {
+
+		if (switchTwoToggled == true) {
+
+		detachInterrupt(interruptSWITCH2);
+
+		digitalWrite(TFT_LED_OUT1, HIGH); // Output for LCD back light (low is off).
+		digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
+		mcp.digitalWrite(0, HIGH);
+		mcp.digitalWrite(1, HIGH);
+		mcp.digitalWrite(2, HIGH);
+		mcp.digitalWrite(3, HIGH);
+		mcp.digitalWrite(4, HIGH);
+		mcp.digitalWrite(5, HIGH);
+		mcp.digitalWrite(6, HIGH);
+		mcp.digitalWrite(7, HIGH);
+
+		switchTwoToggled = false;
+
+		attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
+
+		}
+
+	}
+
+	if (switchTwoState == false) {
+
+		if (switchTwoToggled == true)  {
+
+		detachInterrupt(interruptSWITCH2);
+
+		digitalWrite(TFT_LED_OUT1, LOW); // Output for LCD back light (low is off).
+		digitalWrite(TFT_LED_OUT2, LOW); // Output for LCD back light (low is off).
+		mcp.digitalWrite(0, LOW);
+		mcp.digitalWrite(1, LOW);
+		mcp.digitalWrite(2, LOW);
+		mcp.digitalWrite(3, LOW);
+		mcp.digitalWrite(4, LOW);
+		mcp.digitalWrite(5, LOW);
+		mcp.digitalWrite(6, LOW);
+		mcp.digitalWrite(7, LOW);
+
+		switchTwoToggled = false;
+
+		attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
 
 		}
 
