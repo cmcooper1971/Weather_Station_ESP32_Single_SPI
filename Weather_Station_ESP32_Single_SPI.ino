@@ -6,7 +6,6 @@
 
 // Libraries.
 
-
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
@@ -18,6 +17,7 @@
 #include <SPIFFS.h>
 #include <ArduinoJSON.h>
 #include <Adafruit_MCP23X08.h>
+#include <SimpleBME280.h>
 
 #include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
@@ -65,6 +65,8 @@
 #define interruptSWITCH1	1
 #define interruptSWITCH2	3
 
+#define SEALEVELPRESSURE_HPA (1013.25)
+
 // Configure switchs
 
 boolean switchOneState = false;
@@ -82,6 +84,11 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_RST); // CS0 is 
 // MCP23008
 
 Adafruit_MCP23X08 mcp;
+
+// BME280 Sensor
+
+SimpleBME280 bme280;
+float t, p, h;
 
 // Configure time settings.
 
@@ -713,7 +720,15 @@ void setup() {
 	//Serial.begin(115200);
 	//delay(100);
 
+	// Start I2C Devices
+
 	mcp.begin_I2C();      // use default address 0
+
+	//Serial.println(F("BME280 test"));
+
+	bme280.begin();
+	delay(100);
+	Serial.println(F("t,p,h"));
 
 	// Set pin modes.
 
@@ -821,7 +836,7 @@ void setup() {
 	// Send screen configuration.
 
 	//tft1.begin();
-	tft.begin(27000000); // 40000000 27000000
+	tft.begin(40000000); // 40000000 27000000
 	tft.setRotation(3);
 	tft.setCursor(0, 0);
 
@@ -2141,10 +2156,15 @@ void currentWeatherTemp() {
 		tft.setTextColor(BLACK, WHITE);
 		tft.setCursor(5, 20);
 		tft.println("Current Weather");
+		bme280.update();
+		t = bme280.getT();
+		h = bme280.getH();
 		tft.setCursor(150, 20);			// Remove later
-		tft.print("Swt 1: ");				// Remove later
-		tft.print(switchOneState);			// Remove later
-		tft.setFont();
+		tft.print("T: ");				// Remove later
+		tft.print(t);					// Remove later
+		tft.print(" H: ");			// Remove later
+		tft.print(h);					// Remove later
+		tft.setFont();					// Remove later
 
 	}
 
@@ -2159,11 +2179,16 @@ void currentWeatherTemp() {
 		tft.setTextColor(BLACK, WHITE);
 		tft.setCursor(5, 20);
 		tft.print(weatherDesCurrent);
+		bme280.update();
+		t = bme280.getT();
+		h = bme280.getH();
 		tft.setCursor(150, 20);			// Remove later
-		tft.print("Swt 1: ");				// Remove later
-		tft.print(switchOneState);			// Remove later
-		tft.setFont();
-
+		tft.print("T: ");				// Remove later
+		tft.print(t);					// Remove later
+		tft.print(" H: ");			// Remove later
+		tft.print(h);					// Remove later
+		tft.setFont();					// Remove later
+			
 	}
 
 	disableVSPIScreens();
