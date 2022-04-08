@@ -149,11 +149,13 @@ void forecastWeatherImage(Adafruit_ILI9341& tft, int weatherID) {
 		drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, overcastCloudsDay, WEATHERICON_W, WEATHERICON_H);
 	}
 
-	else {
-	
-		Serial.println("Who knows?");
-		drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, rainbow, WEATHERICON_W, WEATHERICON_H);
-	}
+	// Make sure this goes back in
+
+	//else {
+	//
+	//	Serial.println("Who knows?");
+	//	drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, rainbow, WEATHERICON_W, WEATHERICON_H);
+	//}
 
 }  // Close function.
 

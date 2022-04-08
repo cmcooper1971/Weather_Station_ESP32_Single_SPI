@@ -29,9 +29,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_MCP23017_Arduino_L
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleBME280", "Libraries\SimpleBME280\SimpleBME280.vcxitems", "{8E931BD0-FB4F-4240-9828-58C4BFEEE434}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XPT2046_Touchscreen", "Libraries\XPT2046_Touchscreen\XPT2046_Touchscreen.vcxitems", "{0ED2619F-7E93-4EA0-8169-B4BF94DB99BA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{0ea0e7ee-91d1-4809-88ef-c98277904eba}*SharedItemsImports = 9
+		Libraries\XPT2046_Touchscreen\XPT2046_Touchscreen.vcxitems*{0ed2619f-7e93-4ea0-8169-b4bf94db99ba}*SharedItemsImports = 9
 		Libraries\ESP32Time\ESP32Time.vcxitems*{171f0ebe-ef6d-4954-8742-cd3d343fb5cd}*SharedItemsImports = 9
 		Libraries\SPI\SPI.vcxitems*{2c9a4b19-5d7e-4023-8298-675ba4f98886}*SharedItemsImports = 9
 		Libraries\Wire\Wire.vcxitems*{5f8c3800-fe16-49b3-9cea-71dd264dec70}*SharedItemsImports = 9
@@ -54,6 +57,7 @@ Global
 		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\WiFi\WiFi.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\Wire\Wire.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\XPT2046_Touchscreen\XPT2046_Touchscreen.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\WiFi\WiFi.vcxitems*{fefa8805-cf2e-4cad-bef7-05012a942e94}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

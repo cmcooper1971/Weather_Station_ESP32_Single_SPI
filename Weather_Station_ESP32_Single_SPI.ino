@@ -6,6 +6,8 @@
 
 // Libraries.
 
+
+
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
@@ -18,7 +20,7 @@
 #include <ArduinoJSON.h>
 #include <Adafruit_MCP23X08.h>
 #include <SimpleBME280.h>
-
+#include <XPT2046_Touchscreen.h>
 #include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
 #include <EEPROM.h>
@@ -51,28 +53,45 @@
 
 #define VSPI_CS0	36 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes.
 #define VSPI_CS1    5  // Screen one chip select.
-#define VSPI_CS2    17  // 21 // Screen two chip select.
-#define VSPI_CS3    16 // 16 // Screen three chip select.
-#define VSPI_CS4    15 // 17 // Screen four chip select.
-#define VSPI_CS5    26 // 15 // Screen five chip select.
+#define VSPI_CS2    17 // Screen two chip select.
+#define VSPI_CS3    16 // Screen three chip select.
+#define VSPI_CS4    15 // Screen four chip select.
+#define VSPI_CS5    26 // Screen five chip select.
 #define VSPI_CS6    25 // Screen six chip select.
 #define VSPI_CS7    33 // Screen seven chip select.
 #define VSPI_CS8    32 // Screen eight chip select.
+#define touch_CS	0  // Touch chip select.
 
-#define TFT_LED_OUT1	0 // LED backlight output pin.   
-#define TFT_LED_OUT2	2 // LED backlight output pin.
+XPT2046_Touchscreen ts(touch_CS);
 
-#define interruptSWITCH1	1
-#define interruptSWITCH2	3
+// MCP23008 Interface
+
+#define TFT_LED1_CTRL	4 // GPIO MCP23008
+#define TFT_LED2_CTRL	5 // GPIO MCP23008
+#define TFT_LED3_CTRL	6 // GPIO MCP23008
+#define TFT_LED4_CTRL	7 // GPIO MCP23008
+#define TFT_LED5_CTRL	1 // GPIO MCP23008
+#define TFT_LED6_CTRL	2 // GPIO MCP23008
+#define TFT_LED7_CTRL	3 // GPIO MCP23008
+#define TFT_LED8_CTRL	0 // GPIO MCP23008
+
+#define MCP23008_RST	27// Reset MCP23008 line
+
+// Other defines
+
+//#define interruptSWITCH1	1
+//#define interruptSWITCH2	3
+#define touchSwitch1 
 
 #define SEALEVELPRESSURE_HPA (1013.25)
+
 
 // Configure switchs
 
 boolean switchOneState = false;
 boolean switchOneToggled = false;
 
-boolean switchTwoState = true;
+boolean switchTwoState = false;
 boolean switchTwoToggled = false;
 
 // VSPI Class (default).
@@ -147,7 +166,7 @@ IPAddress dns1;
 // Json Variable to Hold Sensor Readings
 
 String jsonBuffer;
-DynamicJsonDocument weatherData(40000); //35788
+DynamicJsonDocument weatherData(35788); //35788
 
 // Open Weather - your domain name with URL path or IP address with path
 
@@ -717,23 +736,24 @@ void setup() {
 
 	//Begin serial mode.
 
-	//Serial.begin(115200);
+	Serial.begin(115200);
 	//delay(100);
+
+	// Touch setup
+
+	ts.begin();
 
 	// Start I2C Devices
 
 	mcp.begin_I2C();      // use default address 0
 
-	//Serial.println(F("BME280 test"));
+	Serial.println(F("BME280 test"));
 
 	bme280.begin();
 	delay(100);
 	Serial.println(F("t,p,h"));
 
 	// Set pin modes.
-
-	pinMode(TFT_LED_OUT1, OUTPUT); // Enable TFT LED backlight control.
-	pinMode(TFT_LED_OUT2, OUTPUT); // Enable TFT LED backlight control.
 
 	pinMode(VSPI_CS1, OUTPUT); //VSPI CS
 	pinMode(VSPI_CS2, OUTPUT); //VSPI CS
@@ -743,78 +763,59 @@ void setup() {
 	pinMode(VSPI_CS6, OUTPUT); //VSPI CS
 	pinMode(VSPI_CS7, OUTPUT); //VSPI CS
 	pinMode(VSPI_CS8, OUTPUT); //VSPI CS
+	pinMode(touch_CS, OUTPUT); //Touch CS
 
-	pinMode(interruptSWITCH1, INPUT_PULLUP); //Interupt
-	pinMode(interruptSWITCH2, INPUT_PULLUP); //Interupt
+	//pinMode(interruptSWITCH1, INPUT_PULLUP); //Interupt
+	//pinMode(interruptSWITCH2, INPUT_PULLUP); //Interupt
 
 	// Configure interrupt.
 
-	attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
-	attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
+	//attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
+	//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
 
-	pinMode(27, OUTPUT);
+	pinMode(MCP23008_RST, OUTPUT);
 
-	digitalWrite(27, LOW);
+	digitalWrite(MCP23008_RST, LOW);
 	delay(10);
-	digitalWrite(27, HIGH);
+	digitalWrite(MCP23008_RST, HIGH);
 
-	mcp.pinMode(0, OUTPUT);
-	mcp.pinMode(1, OUTPUT);
-	mcp.pinMode(2, OUTPUT);
-	mcp.pinMode(3, OUTPUT);
-	mcp.pinMode(4, OUTPUT);
-	mcp.pinMode(5, OUTPUT);
-	mcp.pinMode(6, OUTPUT);
-	mcp.pinMode(7, OUTPUT);
+	mcp.pinMode(TFT_LED1_CTRL, OUTPUT);
+	mcp.pinMode(TFT_LED2_CTRL, OUTPUT);
+	mcp.pinMode(TFT_LED3_CTRL, OUTPUT);
+	mcp.pinMode(TFT_LED4_CTRL, OUTPUT);
+	mcp.pinMode(TFT_LED5_CTRL, OUTPUT);
+	mcp.pinMode(TFT_LED6_CTRL, OUTPUT);
+	mcp.pinMode(TFT_LED7_CTRL, OUTPUT);
+	mcp.pinMode(TFT_LED8_CTRL, OUTPUT);
 
-	mcp.digitalWrite(0, LOW);
-	mcp.digitalWrite(1, LOW);
-	mcp.digitalWrite(2, LOW);
-	mcp.digitalWrite(3, LOW);
-	mcp.digitalWrite(4, LOW);
-	mcp.digitalWrite(5, LOW);
-	mcp.digitalWrite(6, LOW);
-	mcp.digitalWrite(7, LOW);
-
-	delay(200);
-	mcp.digitalWrite(0, HIGH);
-	delay(200);
-	mcp.digitalWrite(1, HIGH);
-	delay(200);
-	mcp.digitalWrite(2, HIGH);
-	delay(200);
-	mcp.digitalWrite(3, HIGH);
-	delay(200);
-	mcp.digitalWrite(4, HIGH);
-	delay(200);
-	mcp.digitalWrite(5, HIGH);
-	delay(200);
-	mcp.digitalWrite(6, HIGH);
-	delay(200);
-	mcp.digitalWrite(7, HIGH);
+	mcp.digitalWrite(TFT_LED1_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED2_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED3_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED4_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED5_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED6_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED7_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED8_CTRL, LOW);
 
 	delay(200);
-	mcp.digitalWrite(0, LOW);
+	mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
 	delay(200);
-	mcp.digitalWrite(1, LOW);
+	mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
 	delay(200);
-	mcp.digitalWrite(2, LOW);
+	mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
 	delay(200);
-	mcp.digitalWrite(3, LOW);
+	mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
 	delay(200);
-	mcp.digitalWrite(4, LOW);
+	mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
 	delay(200);
-	mcp.digitalWrite(5, LOW);
+	mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
 	delay(200);
-	mcp.digitalWrite(6, LOW);
+	mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
 	delay(200);
-	mcp.digitalWrite(7, LOW);
-	delay(200);
+	mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
 
-	// Switch on TFT LED back light.
-
-	digitalWrite(TFT_LED_OUT1, HIGH); // Output for LCD back light (low is off).
-	digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
+	digitalWrite(touch_CS, HIGH);
+	delay(100);
 
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
 
@@ -836,7 +837,7 @@ void setup() {
 	// Send screen configuration.
 
 	//tft1.begin();
-	tft.begin(40000000); // 40000000 27000000
+	tft.begin(27000000); // 40000000 27000000
 	tft.setRotation(3);
 	tft.setCursor(0, 0);
 
@@ -923,13 +924,19 @@ void setup() {
 
 	delay(2000);
 
-	digitalWrite(TFT_LED_OUT2, LOW); // Output for LCD back light (low is off).
-
 	// Clear screens.
 
 	enableScreen1();
 	tft.fillScreen(WHITE);
 	disableVSPIScreens();
+
+	mcp.digitalWrite(TFT_LED2_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED3_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED4_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED5_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED6_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED7_CTRL, LOW);
+	mcp.digitalWrite(TFT_LED8_CTRL, LOW);
 
 	enableScreen2();
 	tft.fillScreen(BLACK);
@@ -1200,6 +1207,14 @@ void setup() {
 
 	disableVSPIScreens();
 
+	mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
+
 	enableScreen2();
 	tft.fillScreen(WHITE);
 	disableVSPIScreens();
@@ -1227,16 +1242,6 @@ void setup() {
 	enableScreen8();
 	tft.fillScreen(WHITE);
 	disableVSPIScreens();
-
-	digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
-	mcp.digitalWrite(0, HIGH);
-	mcp.digitalWrite(1, HIGH);
-	mcp.digitalWrite(2, HIGH);
-	mcp.digitalWrite(3, HIGH);
-	mcp.digitalWrite(4, HIGH);
-	mcp.digitalWrite(5, HIGH);
-	mcp.digitalWrite(6, HIGH);
-	mcp.digitalWrite(7, HIGH);
 
 	// Initialize time and get the time.
 
@@ -1344,13 +1349,46 @@ ICACHE_RAM_ATTR void displayBackLight() {
 
 void loop() {
 
+	if (ts.touched()) {
+		TS_Point p = ts.getPoint();
+		Serial.print("Pressure = ");
+		Serial.print(p.z);
+		Serial.print(", x = ");
+		Serial.print(p.x);
+		Serial.print(", y = ");
+		Serial.print(p.y);
+		delay(30);
+		Serial.println();
+
+		static unsigned long  last_interrupt_time = 0;                  // This needs to be changed as it was pinched
+		unsigned long         interrupt_time = millis();
+
+		if (interrupt_time - last_interrupt_time > 500)
+		{
+			if (switchOneState == false) {
+
+				switchOneState = true;
+				switchOneToggled = true;
+				intervalTTime = 0;
+			}
+
+			else if (switchOneState == true) {
+
+				switchOneState = false;
+				switchOneToggled = true;
+				intervalTTime = 0;
+			}
+		}
+
+	}
+	
 	// Check Open Weather at regular intervals.
 
 	if (millis() >= intervalT + intervalTime) {
 
 		// Disconnect Interrupt
 
-		detachInterrupt(interruptSWITCH1);
+		//detachInterrupt(interruptSWITCH1);
 
 		// Update time.
 
@@ -1391,7 +1429,7 @@ void loop() {
 		intervalTime = 60000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
 		intervalT = millis();
 
-		attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
+		//attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
 
 	}
 
@@ -1399,7 +1437,7 @@ void loop() {
 
 		// Disconnect Interrupt
 
-		detachInterrupt(interruptSWITCH1);
+		//detachInterrupt(interruptSWITCH1);
 
 		// Alternate temperature displays, min, max, day, night.
 
@@ -1483,7 +1521,7 @@ void loop() {
 		intervalTTime = 3000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
 		intervalTT = millis();
 
-		attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
+		//attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
 
 	}
 
@@ -1493,7 +1531,7 @@ void loop() {
 
 			// Disconnect Interrupt
 
-			detachInterrupt(interruptSWITCH1);
+			//detachInterrupt(interruptSWITCH1);
 
 			enableScreen2();
 			tft.fillScreen(WHITE);
@@ -1512,7 +1550,7 @@ void loop() {
 
 			switchOneToggled = false;
 
-			attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
+			//attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
 
 		}
 
@@ -1522,10 +1560,8 @@ void loop() {
 
 		if (switchTwoToggled == true) {
 
-		detachInterrupt(interruptSWITCH2);
+		//detachInterrupt(interruptSWITCH2);
 
-		digitalWrite(TFT_LED_OUT1, HIGH); // Output for LCD back light (low is off).
-		digitalWrite(TFT_LED_OUT2, HIGH); // Output for LCD back light (low is off).
 		mcp.digitalWrite(0, HIGH);
 		mcp.digitalWrite(1, HIGH);
 		mcp.digitalWrite(2, HIGH);
@@ -1537,7 +1573,7 @@ void loop() {
 
 		switchTwoToggled = false;
 
-		attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
+		//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
 
 		}
 
@@ -1547,10 +1583,8 @@ void loop() {
 
 		if (switchTwoToggled == true)  {
 
-		detachInterrupt(interruptSWITCH2);
+		//detachInterrupt(interruptSWITCH2);
 
-		digitalWrite(TFT_LED_OUT1, LOW); // Output for LCD back light (low is off).
-		digitalWrite(TFT_LED_OUT2, LOW); // Output for LCD back light (low is off).
 		mcp.digitalWrite(0, LOW);
 		mcp.digitalWrite(1, LOW);
 		mcp.digitalWrite(2, LOW);
@@ -1562,7 +1596,7 @@ void loop() {
 
 		switchTwoToggled = false;
 
-		attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
+		//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
 
 		}
 
@@ -2162,7 +2196,7 @@ void currentWeatherTemp() {
 		tft.setCursor(150, 20);			// Remove later
 		tft.print("T: ");				// Remove later
 		tft.print(t);					// Remove later
-		tft.print(" H: ");			// Remove later
+		tft.print(" H: ");				// Remove later
 		tft.print(h);					// Remove later
 		tft.setFont();					// Remove later
 
@@ -2185,7 +2219,7 @@ void currentWeatherTemp() {
 		tft.setCursor(150, 20);			// Remove later
 		tft.print("T: ");				// Remove later
 		tft.print(t);					// Remove later
-		tft.print(" H: ");			// Remove later
+		tft.print(" H: ");				// Remove later
 		tft.print(h);					// Remove later
 		tft.setFont();					// Remove later
 			

@@ -127,10 +127,12 @@ void currentWeatherImage(Adafruit_ILI9341& tft, int weatherID, boolean dayNight)
 			drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, fewCloudsNight, WEATHERICON_W, WEATHERICON_H);
 		}
 
-		else {
-			Serial.println(F("Who knows?"));
-			drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, rainbow, WEATHERICON_W, WEATHERICON_H);
-		}
+		// Make sure this goes back in
+
+		//else {
+		//	Serial.println(F("Who knows?"));
+		//	drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, rainbow, WEATHERICON_W, WEATHERICON_H);
+		//}
 
 	}
 
@@ -236,10 +238,12 @@ void currentWeatherImage(Adafruit_ILI9341& tft, int weatherID, boolean dayNight)
 			drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, overcastCloudsDay, WEATHERICON_W, WEATHERICON_H);
 		}
 
-		else {
-			Serial.println(F("Who knows?"));
-			drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, rainbow, WEATHERICON_W, WEATHERICON_H);
-		}
+		// Make sure this goes back in
+
+		//else {
+		//	Serial.println(F("Who knows?"));
+		//	drawBitmap(tft, WEATHERICON_Y, WEATHERICON_X, rainbow, WEATHERICON_W, WEATHERICON_H);
+		//}
 
 	}
 
