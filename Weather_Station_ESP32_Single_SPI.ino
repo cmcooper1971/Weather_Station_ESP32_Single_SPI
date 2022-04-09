@@ -6,8 +6,6 @@
 
 // Libraries.
 
-
-
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
@@ -18,10 +16,11 @@
 #include <HTTPClient.h>
 #include <SPIFFS.h>
 #include <ArduinoJSON.h>
-#include <Adafruit_MCP23X08.h>
-#include <SimpleBME280.h>
-#include <XPT2046_Touchscreen.h>
-#include <Fonts/FreeSans9pt7b.h>
+#include <Adafruit_MCP23X08.h>		// Additional I/O port expander.
+#include <SimpleBME280.h>			// Internal environment sensor.
+#include <XPT2046_Touchscreen.h>	// Touch screen control.
+
+#include <Fonts/FreeSans9pt7b.h>	
 #include <Fonts/FreeSans12pt7b.h>
 #include <EEPROM.h>
 
@@ -85,7 +84,6 @@ XPT2046_Touchscreen ts(touch_CS);
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-
 // Configure switchs
 
 boolean switchOneState = false;
@@ -115,7 +113,7 @@ ESP32Time rtc;
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 0;
-const int   daylightOffset_sec = 0;
+int			daylightOffset_sec = 0;
 long		LocalTime;
 int			localTimeInterval = 60000;
 
@@ -705,7 +703,9 @@ void printLocalTime() {
 		return;
 	}
 
+	Serial.println("");
 	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M %Z");
+	Serial.println("");
 
 	// Text block to over write characters from longer dates when date changes and unit has been running.
 
@@ -734,24 +734,29 @@ void printLocalTime() {
 
 void setup() {
 
-	//Begin serial mode.
+	// Enable serial mode.
 
 	Serial.begin(115200);
-	//delay(100);
 
-	// Touch setup
+	// Enable touch screen.
+
+	Serial.println(F(""));
+	Serial.println(F("Touch start"));
 
 	ts.begin();
 
-	// Start I2C Devices
+	// Enable I2C Devices.
 
-	mcp.begin_I2C();      // use default address 0
+	Serial.println(F("MCP23008 start"));
 
-	Serial.println(F("BME280 test"));
+	mcp.begin_I2C(); 
+
+	// Enable BME sensor.
+
+	Serial.println(F("BME280 start"));
+	Serial.println(F(""));
 
 	bme280.begin();
-	delay(100);
-	Serial.println(F("t,p,h"));
 
 	// Set pin modes.
 
@@ -773,11 +778,15 @@ void setup() {
 	//attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
 	//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
 
-	pinMode(MCP23008_RST, OUTPUT);
+	// Reset MCP23008 port driver.
 
+	pinMode(MCP23008_RST, OUTPUT);
+	delay(10);
 	digitalWrite(MCP23008_RST, LOW);
 	delay(10);
 	digitalWrite(MCP23008_RST, HIGH);
+
+	// Set MCP23008 outputs.
 
 	mcp.pinMode(TFT_LED1_CTRL, OUTPUT);
 	mcp.pinMode(TFT_LED2_CTRL, OUTPUT);
@@ -788,6 +797,10 @@ void setup() {
 	mcp.pinMode(TFT_LED7_CTRL, OUTPUT);
 	mcp.pinMode(TFT_LED8_CTRL, OUTPUT);
 
+	delay(100);
+
+	// Reset MCP23008 lines.
+
 	mcp.digitalWrite(TFT_LED1_CTRL, LOW);
 	mcp.digitalWrite(TFT_LED2_CTRL, LOW);
 	mcp.digitalWrite(TFT_LED3_CTRL, LOW);
@@ -796,6 +809,8 @@ void setup() {
 	mcp.digitalWrite(TFT_LED6_CTRL, LOW);
 	mcp.digitalWrite(TFT_LED7_CTRL, LOW);
 	mcp.digitalWrite(TFT_LED8_CTRL, LOW);
+
+	// Enable all TFT back lights.
 
 	delay(200);
 	mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
@@ -814,14 +829,16 @@ void setup() {
 	delay(200);
 	mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
 
+	// Start touch sensor.
+
 	digitalWrite(touch_CS, HIGH);
-	delay(100);
+	delay(10);
 
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
 
 	disableVSPIScreens();
 	
-	delay(200);
+	delay(10);
 
 	// Set all tft1 chip select outputs low to configure all displays the same using tft.begin.
 
@@ -833,6 +850,8 @@ void setup() {
 	digitalWrite(VSPI_CS6, LOW);
 	digitalWrite(VSPI_CS7, LOW);
 	digitalWrite(VSPI_CS8, LOW);
+
+	delay(10);
 
 	// Send screen configuration.
 
@@ -1243,6 +1262,10 @@ void setup() {
 	tft.fillScreen(WHITE);
 	disableVSPIScreens();
 
+	// Get weather data.
+
+	getWeatherData();
+
 	// Initialize time and get the time.
 
 	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -1261,8 +1284,6 @@ void setup() {
 	forecastWeatherLayoutDayX(tft, 6);
 	forecastWeatherLayoutDayX(tft, 7);
 	forecastWeatherLayoutDayX(tft, 8);
-
-	getWeatherData();
 
 	currentWeatherTemp();
 	currentWeatherDataDisplay();
@@ -1623,6 +1644,7 @@ void getWeatherData() {
 	// Parse current weather data from Json.
 
 	currentWeatherTime = (myObject["current"]["dt"]);
+	daylightOffset_sec = (myObject["timezone_offset"]);
 	tempNow = (myObject["current"]["temp"]);
 	feelsLikeTempNow = (myObject["current"]["feels_like"]);
 	pressureNow = (myObject["current"]["pressure"]);
@@ -1642,34 +1664,36 @@ void getWeatherData() {
 	weatherDesCurrent.remove(0, 1);
 	weatherDesCurrent[0] = toupper(weatherDesCurrent[0]);
 
-	//Serial.println(F(""));
-	//Serial.print(F("Json Variable Current Epoch : "));
-	//Serial.println(currentWeatherTime);
-	//Serial.print(F("Json Variable Weather ID    : "));
-	//Serial.println(currentWeatherNow);
-	//Serial.print(F("Json Variable Temperature   : "));
-	//Serial.println(tempNow);
-	//Serial.print(F("Json Variable Feels Like    : "));
-	//Serial.println(feelsLikeTempNow);
-	//Serial.print(F("Json Variable Pressure      : "));
-	//Serial.println(pressureNow);
-	//Serial.print(F("Json Variable Humidity      : "));
-	//Serial.println(humidityNow);
-	//Serial.print(F("Json Variable Wind Speed    : "));
-	//Serial.println(windSpeedNow);
-	//Serial.print(F("Json Variable Wind Direction: "));
-	//Serial.println(windDirectionNow);
-	//Serial.print(F("Json Variable UV Index      : "));
-	//Serial.println(uvIndexNow);
-	//Serial.print(F("Json Variable Rain Level    : "));
-	//Serial.println(rainLevelNow);
-	//Serial.print(F("Json Variable Snow Level    : "));
-	//Serial.println(snowLevelNow);
-	//Serial.print(F("Json Variable Sunrise       : "));
-	//Serial.println(sunRiseNow);
-	//Serial.print(F("Json Variable Sunset        : "));
-	//Serial.println(sunSetNow);
-	//Serial.println(F(""));
+	Serial.println(F(""));
+	Serial.print(F("Json Time Zone Offset       : "));
+	Serial.println(daylightOffset_sec);
+	Serial.print(F("Json Variable Current Epoch : "));
+	Serial.println(currentWeatherTime);
+	Serial.print(F("Json Variable Weather ID    : "));
+	Serial.println(currentWeatherNow);
+	Serial.print(F("Json Variable Temperature   : "));
+	Serial.println(tempNow);
+	Serial.print(F("Json Variable Feels Like    : "));
+	Serial.println(feelsLikeTempNow);
+	Serial.print(F("Json Variable Pressure      : "));
+	Serial.println(pressureNow);
+	Serial.print(F("Json Variable Humidity      : "));
+	Serial.println(humidityNow);
+	Serial.print(F("Json Variable Wind Speed    : "));
+	Serial.println(windSpeedNow);
+	Serial.print(F("Json Variable Wind Direction: "));
+	Serial.println(windDirectionNow);
+	Serial.print(F("Json Variable UV Index      : "));
+	Serial.println(uvIndexNow);
+	Serial.print(F("Json Variable Rain Level    : "));
+	Serial.println(rainLevelNow);
+	Serial.print(F("Json Variable Snow Level    : "));
+	Serial.println(snowLevelNow);
+	Serial.print(F("Json Variable Sunrise       : "));
+	Serial.println(sunRiseNow);
+	Serial.print(F("Json Variable Sunset        : "));
+	Serial.println(sunSetNow);
+	Serial.println(F(""));
 
 	// Parse hourly forecasr weather data from Jason.
 
