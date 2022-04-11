@@ -733,7 +733,7 @@ void printLocalTime() {
 /*-----------------------------------------------------------------*/
 
 void setup() {
-
+	
 	// Enable serial mode.
 
 	Serial.begin(115200);
@@ -829,15 +829,10 @@ void setup() {
 	delay(200);
 	mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
 
-	// Start touch sensor.
-
-	digitalWrite(touch_CS, HIGH);
-	delay(10);
-
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
 
 	disableVSPIScreens();
-	
+
 	delay(10);
 
 	// Set all tft1 chip select outputs low to configure all displays the same using tft.begin.
@@ -850,19 +845,27 @@ void setup() {
 	digitalWrite(VSPI_CS6, LOW);
 	digitalWrite(VSPI_CS7, LOW);
 	digitalWrite(VSPI_CS8, LOW);
+	digitalWrite(touch_CS, LOW);
 
 	delay(10);
+
+	digitalWrite(touch_CS, HIGH);
 
 	// Send screen configuration.
 
 	//tft1.begin();
-	tft.begin(27000000); // 40000000 27000000
+	tft.begin(40000000); // 40000000 27000000
 	tft.setRotation(3);
 	tft.setCursor(0, 0);
 
 	// Reset all chip selects high once again.
 
 	disableVSPIScreens();
+
+	// Start touch sensor.
+
+	digitalWrite(touch_CS, HIGH);
+	delay(10);
 
 	// Start up screen image and title.
 
@@ -1471,32 +1474,32 @@ void loop() {
 
 				if (switchOneToggled == true) {
 
-					enableScreen2();
+					enableScreen5();
 					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 2);
-					forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+					forecastWeatherLayoutDayX(tft, 5);
+					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
 
-					enableScreen3();
+					enableScreen6();
 					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 3);
-					forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+					forecastWeatherLayoutDayX(tft, 6);
+					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
 
-					enableScreen4();
+					enableScreen7();
 					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 4);
-					forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+					forecastWeatherLayoutDayX(tft, 7);
+					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
 
 					switchOneToggled = false;
 				}
 
-				forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-				forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-				forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
+				forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
+				forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
+				forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
 			}
 
-			forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-			forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-			forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+			forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
+			forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
+			forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
 			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
 
 		}
@@ -1510,33 +1513,34 @@ void loop() {
 
 				if (switchOneToggled == true) {
 
-					enableScreen2();
+					enableScreen5();
 					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 2);
-					forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+					forecastWeatherLayoutDayX(tft, 5);
+					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
 
-					enableScreen3();
+					enableScreen6();
 					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 3);
-					forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+					forecastWeatherLayoutDayX(tft, 6);
+					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
 
-					enableScreen4();
+					enableScreen7();
 					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 4);
-					forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+					forecastWeatherLayoutDayX(tft, 7);
+					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
 
 					switchOneToggled = false;
 				}
 
-				forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-				forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-				forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
+				forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
+				forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
+				forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
 			}
 
-			forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-			forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-			forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+			forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
+			forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
+			forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
 			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
+
 		}
 
 		intervalTTime = 3000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
@@ -1554,17 +1558,17 @@ void loop() {
 
 			//detachInterrupt(interruptSWITCH1);
 
-			enableScreen2();
+			enableScreen5();
 			tft.fillScreen(WHITE);
 			drawHourlyTempChart(tft);
 			disableVSPIScreens();
 
-			enableScreen3();
+			enableScreen6();
 			tft.fillScreen(WHITE);
 			drawHourlyRainChart(tft);
 			disableVSPIScreens();
 
-			enableScreen4();
+			enableScreen7();
 			tft.fillScreen(WHITE);
 			drawHourlyPressureChart(tft);
 			disableVSPIScreens();
