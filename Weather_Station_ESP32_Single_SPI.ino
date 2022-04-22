@@ -223,6 +223,7 @@ double rainLevelNow;
 unsigned int snowLevelNow;
 unsigned long sunRiseNow;
 unsigned long sunSetNow;
+double moonPhaseNow;
 
 // Forecast weather variables.
 
@@ -244,6 +245,7 @@ double rainLevelFc1;
 double snowLevelFc1;
 unsigned long sunRiseFc1;
 unsigned long sunSetFc1;
+double moonPhaseFc1;
 
 unsigned long forecastTimeFc2;
 double tempMornFc2;
@@ -263,6 +265,7 @@ double rainLevelFc2;
 double snowLevelFc2;
 unsigned long sunRiseFc2;
 unsigned long sunSetFc2;
+double moonPhaseFc2;
 
 unsigned long forecastTimeFc3;
 double tempMornFc3;
@@ -282,6 +285,7 @@ double rainLevelFc3;
 double snowLevelFc3;
 unsigned long sunRiseFc3;
 unsigned long sunSetFc3;
+double moonPhaseFc3;
 
 unsigned long forecastTimeFc4;
 double tempMornFc4;
@@ -301,6 +305,7 @@ double rainLevelFc4;
 double snowLevelFc4;
 unsigned long sunRiseFc4;
 unsigned long sunSetFc4;
+double moonPhaseFc4;
 
 unsigned long forecastTimeFc5;
 double tempMornFc5;
@@ -320,6 +325,7 @@ double rainLevelFc5;
 double snowLevelFc5;
 unsigned long sunRiseFc5;
 unsigned long sunSetFc5;
+double moonPhaseFc5;
 
 unsigned long forecastTimeFc6;
 double tempMornFc6;
@@ -339,6 +345,7 @@ double rainLevelFc6;
 double snowLevelFc6;
 unsigned long sunRiseFc6;
 unsigned long sunSetFc6;
+double moonPhaseFc6;
 
 unsigned long forecastTimeFc7;
 double tempMornFc7;
@@ -358,6 +365,7 @@ double rainLevelFc7;
 double snowLevelFc7;
 unsigned long sunRiseFc7;
 unsigned long sunSetFc7;
+double moonPhaseFc7;
 
 // Hourly forecast weather variables.
 
@@ -1292,25 +1300,25 @@ void setup() {
 	currentWeatherDataDisplay();
 
 	forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-	forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+	forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1, moonPhaseFc1);
 
 	forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-	forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+	forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2, moonPhaseFc2);
 
 	forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
-	forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+	forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3, moonPhaseFc3);
 
 	forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-	forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
+	forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
 
 	forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-	forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
+	forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
 
 	forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
-	forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
+	forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
 
 	forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
-	forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+	forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
 
 } // Close setup.
 
@@ -1424,31 +1432,45 @@ void loop() {
 
 		// Update current weather display.
 
+		// Clear screen if on hourly view.
+
+		if (switchOneToggled == true) {
+
+			enableScreen5();
+			enableScreen6();
+			enableScreen7();
+			enableScreen8();
+			tft.fillScreen(WHITE);
+			disableVSPIScreens();
+
+			switchOneToggled = false;
+		}
+
 		currentWeatherTemp();
 		currentWeatherDataDisplay();
 
 		// Update forecast weather displays.
 
 		forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
-		forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1);
+		forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1, moonPhaseFc1);
 
 		forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
-		forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2);
+		forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2, moonPhaseFc2);
 
 		forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
-		forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3);
+		forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3, moonPhaseFc3);
 
 		forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
-		forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
+		forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
 
 		forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
-		forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
+		forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
 
 		forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
-		forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
+		forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
 
 		forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
-		forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+		forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
 
 		intervalTime = 60000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
 		intervalT = millis();
@@ -1477,22 +1499,22 @@ void loop() {
 					enableScreen5();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 5);
-					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
+					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
 
 					enableScreen6();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 6);
-					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
+					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
 
 					enableScreen7();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 7);
-					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
+					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
 
 					enableScreen8();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 8);
-					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
 
 					switchOneToggled = false;
 				}
@@ -1521,22 +1543,22 @@ void loop() {
 					enableScreen5();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 5);
-					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4);
+					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
 
 					enableScreen6();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 6);
-					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5);
+					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
 
 					enableScreen7();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 7);
-					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
+					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
 
 					enableScreen8();
 					tft.fillScreen(WHITE);
 					forecastWeatherLayoutDayX(tft, 8);
-					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
 
 
 					switchOneToggled = false;
@@ -1677,6 +1699,7 @@ void getWeatherData() {
 	snowLevelNow = (myObject["current"]["snow"]);
 	sunRiseNow = (myObject["current"]["sunrise"]);
 	sunSetNow = (myObject["current"]["sunset"]);
+	moonPhaseNow = (myObject["daily"][0]["moon_phase"]);
 
 	weatherDesCurrent.clear();
 	serializeJson((myObject["current"]["weather"][0]["description"]), weatherDesCurrent);
@@ -1713,6 +1736,8 @@ void getWeatherData() {
 	Serial.println(sunRiseNow);
 	Serial.print(F("Json Variable Sunset        : "));
 	Serial.println(sunSetNow);
+	Serial.print(F("Json Variable Moon Phase    : "));
+	Serial.println(moonPhaseNow);
 	Serial.println(F(""));
 
 	// Parse hourly forecasr weather data from Jason.
@@ -1763,6 +1788,7 @@ void getWeatherData() {
 	snowLevelFc1 = (myObject["daily"][1]["snow"]);
 	sunRiseFc1 = (myObject["daily"][1]["sunrise"]);
 	sunSetFc1 = (myObject["daily"][1]["sunset"]);
+	moonPhaseFc1 = (myObject["daily"][1]["moon_phase"]);
 
 	weatherDesFc1.clear();
 	serializeJson((myObject["daily"][1]["weather"][0]["description"]), weatherDesFc1);
@@ -1787,6 +1813,7 @@ void getWeatherData() {
 	snowLevelFc2 = (myObject["daily"][2]["snow"]);
 	sunRiseFc2 = (myObject["daily"][2]["sunrise"]);
 	sunSetFc2 = (myObject["daily"][2]["sunset"]);
+	moonPhaseFc2 = (myObject["daily"][2]["moon_phase"]);
 
 	weatherDesFc2.clear();
 	serializeJson((myObject["daily"][2]["weather"][0]["description"]), weatherDesFc2);
@@ -1811,6 +1838,7 @@ void getWeatherData() {
 	snowLevelFc3 = (myObject["daily"][3]["snow"]);
 	sunRiseFc3 = (myObject["daily"][3]["sunrise"]);
 	sunSetFc3 = (myObject["daily"][3]["sunset"]);
+	moonPhaseFc3 = (myObject["daily"][3]["moon_phase"]);
 
 	weatherDesFc3.clear();
 	serializeJson((myObject["daily"][3]["weather"][0]["description"]), weatherDesFc3);
@@ -1835,6 +1863,7 @@ void getWeatherData() {
 	snowLevelFc4 = (myObject["daily"][4]["snow"]);
 	sunRiseFc4 = (myObject["daily"][4]["sunrise"]);
 	sunSetFc4 = (myObject["daily"][4]["sunset"]);
+	moonPhaseFc4 = (myObject["daily"][4]["moon_phase"]);
 
 	weatherDesFc4.clear();
 	serializeJson((myObject["daily"][4]["weather"][0]["description"]), weatherDesFc4);
@@ -1859,6 +1888,7 @@ void getWeatherData() {
 	snowLevelFc5 = (myObject["daily"][5]["snow"]);
 	sunRiseFc5 = (myObject["daily"][5]["sunrise"]);
 	sunSetFc5 = (myObject["daily"][5]["sunset"]);
+	moonPhaseFc5 = (myObject["daily"][5]["moon_phase"]);
 
 	weatherDesFc5.clear();
 	serializeJson((myObject["daily"][5]["weather"][0]["description"]), weatherDesFc5);
@@ -1883,6 +1913,7 @@ void getWeatherData() {
 	snowLevelFc6 = (myObject["daily"][6]["snow"]);
 	sunRiseFc6 = (myObject["daily"][6]["sunrise"]);
 	sunSetFc6 = (myObject["daily"][6]["sunset"]);
+	moonPhaseFc6 = (myObject["daily"][6]["moon_phase"]);
 
 	weatherDesFc6.clear();
 	serializeJson((myObject["daily"][6]["weather"][0]["description"]), weatherDesFc6);
@@ -1907,12 +1938,24 @@ void getWeatherData() {
 	snowLevelFc7 = (myObject["daily"][7]["snow"]);
 	sunRiseFc7 = (myObject["daily"][7]["sunrise"]);
 	sunSetFc7 = (myObject["daily"][7]["sunset"]);
+	moonPhaseFc7 = (myObject["daily"][7]["moon_phase"]);
 
 	weatherDesFc7.clear();
 	serializeJson((myObject["daily"][7]["weather"][0]["description"]), weatherDesFc7);
 	weatherDesFc7.replace('"', ' ');
 	weatherDesFc7.remove(0, 1);
 	weatherDesFc7[0] = toupper(weatherDesFc7[0]);
+
+	Serial.print(F("Json Variable Moon Phase    : "));
+	Serial.println(moonPhaseFc1);
+	Serial.println(moonPhaseFc2);
+	Serial.println(moonPhaseFc3);
+	Serial.println(moonPhaseFc4);
+	Serial.println(moonPhaseFc5);
+	Serial.println(moonPhaseFc6);
+	Serial.println(moonPhaseFc7);
+	Serial.println(F(""));
+
 
 	//Serial.println(F(""));
 	//Serial.print(F("Json Variable Daily Epoch : "));
@@ -1993,8 +2036,6 @@ void currentWeatherLayout() {
 	drawBitmap(tft, SUNRISE_Y, SUNRISE_X, sunrise, SUNRISE_W, SUNRISE_H);
 
 	drawBitmap(tft, SUNSET_Y, SUNSET_X, sunset, SUNSET_W, SUNSET_H);
-
-	drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, lastQuarterMoon, MOONPHASE_W, MOONPHASE_H);
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -2225,6 +2266,8 @@ void currentWeatherDataDisplay() {
 
 	tft.setFont();
 
+	drawCurrentMoonPhase();
+
 	disableVSPIScreens();
 
 } // Close function.
@@ -2363,7 +2406,7 @@ void forecastWeatherLayoutDayX(Adafruit_ILI9341& tft, byte screen) {
 
 // Display forecast data day X.
 
-void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long forecastTimeFc, unsigned int pressureFc, double humidityFc, double windSpeedFc, unsigned int windDirectionFc, byte uvIndexFc, unsigned int weatherLabelFc, double rainLevelFc, unsigned long sunRiseFc, unsigned long sunSetFc) {
+void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long forecastTimeFc, unsigned int pressureFc, double humidityFc, double windSpeedFc, unsigned int windDirectionFc, byte uvIndexFc, unsigned int weatherLabelFc, double rainLevelFc, unsigned long sunRiseFc, unsigned long sunSetFc, double moonPhaseFc) {
 
 	if (screen == 1) {
 
@@ -2578,6 +2621,8 @@ void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	//tft.setCursor(5, 230);
 	//tft.println(buf);
 
+	drawDailyMoonPhase(moonPhaseFc);
+
 	disableVSPIScreens();
 
 } // Close function.
@@ -2771,16 +2816,11 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 	tft.println("Current + hr");
 	tft.setFont();
 
-	tft.setFont(&FreeSans12pt7b);
-	tft.setTextColor(BLACK, WHITE);
-	tft.setCursor(215, 135);
-	tft.println("Current");
-
 	if (temperatureHr1 > 9) {
 
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(240, 160);
+		tft.setCursor(240, 135);
 		tft.println(temperatureHr1);
 	}
 
@@ -2788,7 +2828,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(247, 160);
+		tft.setCursor(247, 135);
 		tft.println(temperatureHr1);
 	}
 
@@ -2796,7 +2836,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(235, 160);
+		tft.setCursor(235, 135);
 		tft.println(temperatureHr1);
 	}
 
@@ -2805,10 +2845,15 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(243, 160);
+		tft.setCursor(243, 135);
 		tft.println(temperatureHr1);
 	}
 
+	tft.setFont();
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(235, 145);
+	tft.println("Degrees");
 	tft.setFont();
 
 	int loVal = -30;
@@ -2881,12 +2926,16 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 
 	tft.setFont(&FreeSans12pt7b);
 	tft.setTextColor(BLACK, WHITE);
-	tft.setCursor(235, 135);
+	tft.setCursor(240, 135);
 	tft.println(rainFallHr1);
-	tft.setCursor(240, 160);
+	tft.setFont();
+	
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(255, 145);
 	tft.println("mm");
 	tft.setFont();
-
+		
 	tft.setTextSize(0);
 
 	// Convert Double to Int
@@ -3106,38 +3155,52 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 
 void drawCompassChart(Adafruit_ILI9341& tft) {
 
-tft.fillScreen(WHITE);
+	tft.fillScreen(WHITE);
 
-tft.setFont(&FreeSans9pt7b);
-tft.setTextSize(1);
-tft.setTextColor(BLACK, WHITE);
-tft.setCursor(5, 20);
-tft.print("Wind Direction");
-tft.setFont();
-
-drawBitmap(tft, 40, 228, weatherVainLrgBlk, 64, 64);
-
-if (windDirectionNow > 99) {
-
-	tft.setFont(&FreeSans12pt7b);
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
 	tft.setTextColor(BLACK, WHITE);
-	tft.setCursor(235, 135);
-	tft.println(windDirectionNow);
+	tft.setCursor(5, 20);
+	tft.print("Wind Direction");
 	tft.setFont();
-}
 
-else {
+	drawBitmap(tft, 40, 228, weatherVainLrgBlk, 64, 64);
 
-	tft.setFont(&FreeSans12pt7b);
+	if (windDirectionNow > 99) {
+
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(245, 135);
+		tft.println(windDirectionNow);
+		tft.setFont();
+	}
+
+	else if  (windDirectionNow > 9) {
+
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(251, 135);
+		tft.println(windDirectionNow);
+		tft.setFont();
+	}
+
+	else {
+
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(256, 135);
+		tft.println(windDirectionNow);
+		tft.setFont();
+	}
+
+	tft.setTextSize(1);
 	tft.setTextColor(BLACK, WHITE);
-	tft.setCursor(242, 135);
-	tft.println(windDirectionNow);
+	tft.setCursor(245, 145);
+	tft.println("Degrees");
 	tft.setFont();
-}
 
-
-drawCompass(tft);
-drawNeedle(tft, windDirectionNow);
+	drawCompass(tft);
+	drawNeedle(tft, windDirectionNow);
 
 } // Close function.
 
@@ -3167,6 +3230,116 @@ void drawBlackBox() {
 	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 25, FRAME2_W - 2, FRAME2_H - 40, BLACK);		// This covers only the graphs and charts, not the system icons to save refresh flicker.
 	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 1, FRAME2_W - 90, FRAME2_H - 200, BLACK);		// Ths covers the title text per page
 	disableVSPIScreens();
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Draw current moon phase.
+
+void drawCurrentMoonPhase() {
+
+	if (moonPhaseNow == 0 || moonPhaseNow == 1) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, newMoon, MOONPHASE_W, MOONPHASE_H);
+	}
+
+	else if (moonPhaseNow > 0 && moonPhaseNow < 0.25) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingCrescentMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseNow == 0.25) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, firstQuarterMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseNow > 0.25 && moonPhaseNow < 0.5) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingGibbousMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseNow == 0.5) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, fullMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseNow > 0.50 && moonPhaseNow < 0.75) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningGibbousMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseNow == 0.75) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, lastQuarterMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseNow > 0.75 && moonPhaseNow < 1) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningCrescentMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Draw current moon phase.
+
+void drawDailyMoonPhase(double moonPhaseFc) {
+
+	if (moonPhaseFc == 0 || moonPhaseFc == 1) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, newMoon, MOONPHASE_W, MOONPHASE_H);
+	}
+
+	else if (moonPhaseFc > 0 && moonPhaseFc < 0.25) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingCrescentMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseFc == 0.25) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, firstQuarterMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseFc > 0.25 && moonPhaseFc < 0.5) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingGibbousMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseFc == 0.5) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, fullMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseFc > 0.50 && moonPhaseFc < 0.75) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningGibbousMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseFc == 0.75) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, lastQuarterMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
+
+	else if (moonPhaseFc > 0.75 && moonPhaseFc < 1) {
+
+		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningCrescentMoon, MOONPHASE_W, MOONPHASE_H);
+
+	}
 
 } // Close function.
 
