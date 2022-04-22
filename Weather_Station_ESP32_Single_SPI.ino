@@ -16,54 +16,56 @@
 #include <HTTPClient.h>
 #include <SPIFFS.h>
 #include <ArduinoJSON.h>
-#include <Adafruit_MCP23X08.h>		// Additional I/O port expander.
-#include <SimpleBME280.h>			// Internal environment sensor.
-#include <XPT2046_Touchscreen.h>	// Touch screen control.
+#include <Adafruit_MCP23X08.h>		// Additional I/O port expander
+#include <SimpleBME280.h>			// Internal environment sensor
+#include <XPT2046_Touchscreen.h>	// Touch screen control
 
 #include <Fonts/FreeSans9pt7b.h>	
 #include <Fonts/FreeSans12pt7b.h>
 #include <EEPROM.h>
 
-#include "getHeading.h"				// Convert headings to N/S/E/W.
-#include "tftControl.h"				// Enable / disable displays.
-#include "currentWeatherImage.h"	// Draw main weather image.
-#include "forecastWeatherImage.h"	// Draw main weather image.
-#include "drawBitmap.h"				// Draw bitmaps.
-#include "drawBarGraph.h"			// Draw bar graphs.
+#include "getHeading.h"				// Convert headings to N/S/E/W
+#include "tftControl.h"				// Enable / disable displays
+#include "currentWeatherImage.h"	// Draw main weather image
+#include "forecastWeatherImage.h"	// Draw main weather image
+#include "drawBitmap.h"				// Draw bitmaps
+#include "drawBarGraph.h"			// Draw bar graphs
+#include "drawCompass.h"			// Draw compass
 
-#include "colours.h"                // Colours.
-#include "screenLayout.h"			// Screen layout.
-#include "icons.h"					// Weather bitmaps.
-#include "iconsAtmosphere.h"		// Weather bitmaps.
-#include "iconsClear.h"				// Weather bitmaps.
-#include "iconsClouds.h"			// Weather bitmaps.
-#include "iconsDrizzle.h"			// Weather bitmaps.
-#include "iconsRain.h"				// Weather bitmaps.
-#include "iconsSnow.h"				// Weather bitmaps.
-#include "iconsThunderstorms.h"		// Weather bitmaps.
+#include "colours.h"                // Colours
+#include "screenLayout.h"			// Screen layout
+#include "icons.h"					// Weather bitmaps
+#include "iconsAtmosphere.h"		// Weather bitmaps
+#include "iconsClear.h"				// Weather bitmaps
+#include "iconsClouds.h"			// Weather bitmaps
+#include "iconsDrizzle.h"			// Weather bitmaps
+#include "iconsRain.h"				// Weather bitmaps
+#include "iconsSnow.h"				// Weather bitmaps
+#include "iconsThunderstorms.h"		// Weather bitmaps
+#include "iconsMoonPhase.h"			// Weather bitmaps
 
 // TFT SPI Interface for ESP32.
 
-#define VSPI_MISO   19 // MISO - Not needed as it is a display.
+#define VSPI_MISO   19 // MISO - Not needed for display(s)
 #define VSPI_MOSI   23 // MOSI
 #define VSPI_CLK    18 // SCK
 #define VSPI_DC     4  // DC
-#define VSPI_RST    13 // 22 // RST							
+#define VSPI_RST    13 // RST							
 
 #define VSPI_CS0	36 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes.
-#define VSPI_CS1    5  // Screen one chip select.
-#define VSPI_CS2    17 // Screen two chip select.
-#define VSPI_CS3    16 // Screen three chip select.
-#define VSPI_CS4    15 // Screen four chip select.
-#define VSPI_CS5    26 // Screen five chip select.
-#define VSPI_CS6    25 // Screen six chip select.
-#define VSPI_CS7    33 // Screen seven chip select.
-#define VSPI_CS8    32 // Screen eight chip select.
-#define touch_CS	0  // Touch chip select.
+#define VSPI_CS1    5  // Screen one chip select
+#define VSPI_CS2    17 // Screen two chip select
+#define VSPI_CS3    16 // Screen three chip select
+#define VSPI_CS4    15 // Screen four chip select
+#define VSPI_CS5    26 // Screen five chip select
+#define VSPI_CS6    25 // Screen six chip select
+#define VSPI_CS7    33 // Screen seven chip select
+#define VSPI_CS8    32 // Screen eight chip select
+#define touch_CS	0  // Touch chip select
 
-XPT2046_Touchscreen ts(touch_CS);
+XPT2046_Touchscreen ts(touch_CS);	// Setup touch on TFT4
 
-// MCP23008 Interface
+// MCP23008 Interface.
 
 #define TFT_LED1_CTRL	4 // GPIO MCP23008
 #define TFT_LED2_CTRL	5 // GPIO MCP23008
@@ -76,7 +78,7 @@ XPT2046_Touchscreen ts(touch_CS);
 
 #define MCP23008_RST	27// Reset MCP23008 line
 
-// Other defines
+// Other defines.
 
 //#define interruptSWITCH1	1
 //#define interruptSWITCH2	3
@@ -84,7 +86,7 @@ XPT2046_Touchscreen ts(touch_CS);
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-// Configure switchs
+// Configure switches.
 
 boolean switchOneState = false;
 boolean switchOneToggled = false;
@@ -93,16 +95,14 @@ boolean switchTwoState = false;
 boolean switchTwoToggled = false;
 
 // VSPI Class (default).
+
 Adafruit_ILI9341 tft = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_RST); // CS0 is a dummy pin
 
-//Software defined SPI.
-//Adafruit_ILI9341 tft1 = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_MOSI, VSPI_CLK, VSPI_RST, VSPI_MISO); // CS0 is a dummy pin 
-
-// MCP23008
+// MCP23008.
 
 Adafruit_MCP23X08 mcp;
 
-// BME280 Sensor
+// BME280 Sensor.
 
 SimpleBME280 bme280;
 float t, p, h;
@@ -124,7 +124,7 @@ AsyncEventSource events("/events");	// Create an Event Source on /events
 
 // WiFi Configuration.
 
-boolean wiFiYN;						// WiFi reset.
+boolean wiFiYN;						// WiFi reset
 boolean apMode = false;
 
 // Search for parameter in HTTP POST request.
@@ -161,12 +161,12 @@ IPAddress Gateway;
 IPAddress Subnet;
 IPAddress dns1;
 
-// Json Variable to Hold Sensor Readings
+// Json Variable to Hold Sensor Readings.
 
 String jsonBuffer;
 DynamicJsonDocument weatherData(35788); //35788
 
-// Open Weather - your domain name with URL path or IP address with path
+// Open Weather - your domain name with URL path or IP address with path.
 
 String openWeatherMapApiKey = "03460ae66bafdbb98dac33a0f7509330";
 
@@ -180,14 +180,14 @@ String longitude = "1.299350";
 // Timer variables (check Open Weather).
 
 unsigned long intervalT = 0;
-unsigned long intervalTime = 300000;			// Reset to 300,000 when finished with design (5 minutes sleep time).
+unsigned long intervalTime = 300000;			// Reset to 300,000 when finished with design (5 minutes sleep time)
 
 // Timer variables (check wifi).
 
-unsigned long wiFiR = 0;					// WiFi retry (wiFiR) to attempt connecting to the last known WiFi if connection lost.
-unsigned long wiFiRI = 60000;				// WiFi retry Interval (wiFiRI) used to retry connecting to the last known WiFi if connection lost.
-unsigned long previousMillis = 0;			// Used in the WiFI Init function.
-const long interval = 10000;				// Interval to wait for Wi-Fi connection (milliseconds).
+unsigned long wiFiR = 0;					// WiFi retry (wiFiR) to attempt connecting to the last known WiFi if connection lost
+unsigned long wiFiRI = 60000;				// WiFi retry Interval (wiFiRI) used to retry connecting to the last known WiFi if connection lost
+unsigned long previousMillis = 0;			// Used in the WiFI Init function
+const long interval = 10000;				// Interval to wait for Wi-Fi connection (milliseconds)
 
 // Timer variables (to update web server).
 
@@ -403,7 +403,7 @@ boolean graph_8 = true;
 
 /*-----------------------------------------------------------------*/
 
-// Initialize WiFi
+// Initialize WiFi.
 
 bool initWiFi() {
 
@@ -733,7 +733,7 @@ void printLocalTime() {
 /*-----------------------------------------------------------------*/
 
 void setup() {
-	
+
 	// Enable serial mode.
 
 	Serial.begin(115200);
@@ -749,7 +749,7 @@ void setup() {
 
 	Serial.println(F("MCP23008 start"));
 
-	mcp.begin_I2C(); 
+	mcp.begin_I2C();
 
 	// Enable BME sensor.
 
@@ -1405,7 +1405,7 @@ void loop() {
 		}
 
 	}
-	
+
 	// Check Open Weather at regular intervals.
 
 	if (millis() >= intervalT + intervalTime) {
@@ -1489,18 +1489,23 @@ void loop() {
 					forecastWeatherLayoutDayX(tft, 7);
 					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
 
+					enableScreen8();
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 8);
+					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+
 					switchOneToggled = false;
 				}
 
 				forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
 				forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
 				forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+				forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
 			}
 
 			forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
 			forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
 			forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
-			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
 
 		}
 
@@ -1528,18 +1533,24 @@ void loop() {
 					forecastWeatherLayoutDayX(tft, 7);
 					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6);
 
+					enableScreen8();
+					tft.fillScreen(WHITE);
+					forecastWeatherLayoutDayX(tft, 8);
+					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7);
+
+
 					switchOneToggled = false;
 				}
 
 				forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4);
 				forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5);
 				forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6);
+				forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
 			}
 
 			forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1);
 			forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2);
 			forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3);
-			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7);
 
 		}
 
@@ -1573,6 +1584,11 @@ void loop() {
 			drawHourlyPressureChart(tft);
 			disableVSPIScreens();
 
+			enableScreen8();
+			tft.fillScreen(WHITE);
+			drawCompassChart(tft);
+			disableVSPIScreens();
+
 			switchOneToggled = false;
 
 			//attachInterrupt(digitalPinToInterrupt(interruptSWITCH1), displayToggle, FALLING);
@@ -1585,20 +1601,20 @@ void loop() {
 
 		if (switchTwoToggled == true) {
 
-		//detachInterrupt(interruptSWITCH2);
+			//detachInterrupt(interruptSWITCH2);
 
-		mcp.digitalWrite(0, HIGH);
-		mcp.digitalWrite(1, HIGH);
-		mcp.digitalWrite(2, HIGH);
-		mcp.digitalWrite(3, HIGH);
-		mcp.digitalWrite(4, HIGH);
-		mcp.digitalWrite(5, HIGH);
-		mcp.digitalWrite(6, HIGH);
-		mcp.digitalWrite(7, HIGH);
+			mcp.digitalWrite(0, HIGH);
+			mcp.digitalWrite(1, HIGH);
+			mcp.digitalWrite(2, HIGH);
+			mcp.digitalWrite(3, HIGH);
+			mcp.digitalWrite(4, HIGH);
+			mcp.digitalWrite(5, HIGH);
+			mcp.digitalWrite(6, HIGH);
+			mcp.digitalWrite(7, HIGH);
 
-		switchTwoToggled = false;
+			switchTwoToggled = false;
 
-		//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
+			//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
 
 		}
 
@@ -1606,22 +1622,22 @@ void loop() {
 
 	if (switchTwoState == false) {
 
-		if (switchTwoToggled == true)  {
+		if (switchTwoToggled == true) {
 
-		//detachInterrupt(interruptSWITCH2);
+			//detachInterrupt(interruptSWITCH2);
 
-		mcp.digitalWrite(0, LOW);
-		mcp.digitalWrite(1, LOW);
-		mcp.digitalWrite(2, LOW);
-		mcp.digitalWrite(3, LOW);
-		mcp.digitalWrite(4, LOW);
-		mcp.digitalWrite(5, LOW);
-		mcp.digitalWrite(6, LOW);
-		mcp.digitalWrite(7, LOW);
+			mcp.digitalWrite(0, LOW);
+			mcp.digitalWrite(1, LOW);
+			mcp.digitalWrite(2, LOW);
+			mcp.digitalWrite(3, LOW);
+			mcp.digitalWrite(4, LOW);
+			mcp.digitalWrite(5, LOW);
+			mcp.digitalWrite(6, LOW);
+			mcp.digitalWrite(7, LOW);
 
-		switchTwoToggled = false;
+			switchTwoToggled = false;
 
-		//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
+			//attachInterrupt(digitalPinToInterrupt(interruptSWITCH2), displayBackLight, FALLING);
 
 		}
 
@@ -1978,9 +1994,19 @@ void currentWeatherLayout() {
 
 	drawBitmap(tft, SUNSET_Y, SUNSET_X, sunset, SUNSET_W, SUNSET_H);
 
+	drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, lastQuarterMoon, MOONPHASE_W, MOONPHASE_H);
+
+	tft.setFont();
+	tft.setTextSize(0);
+	tft.setTextColor(BLACK);
+	tft.setCursor(112, 215);
+	tft.printf("Moon");
+
+	tft.setFont();
+
 	drawBitmap(tft, WINDSPEEDICON_Y, WINDSPEEDICON_X, windSpeed, WINDSPEEDICON_W, WINDSPEEDICON_H);
 
-	drawBitmap(tft, WINDDIRECTIONICON_Y, WINDDIRECTIONICON_X, windDirection, WINDDIRECTIONICON_W, WINDDIRECTIONICON_H);
+	drawBitmap(tft, WINDDIRECTIONICON_Y, WINDDIRECTIONICON_X, weatherVain, WINDDIRECTIONICON_W, WINDDIRECTIONICON_H);
 
 	drawBitmap(tft, PRESSUREICON_Y, PRESSUREICON_X, pressure, PRESSUREICON_W, PRESSUREICON_H);
 
@@ -2194,7 +2220,7 @@ void currentWeatherDataDisplay() {
 	tft.setFont();
 	tft.setTextSize(0);
 	tft.setTextColor(BLACK);
-	tft.setCursor(71, 215);
+	tft.setCursor(61, 215);
 	tft.printf("%s\n", buf);
 
 	tft.setFont();
@@ -2250,11 +2276,11 @@ void currentWeatherTemp() {
 		tft.print(" H: ");				// Remove later
 		tft.print(h);					// Remove later
 		tft.setFont();					// Remove later
-			
+
 	}
 
 	disableVSPIScreens();
-	
+
 } // Close function.
 
 /*-----------------------------------------------------------------*/
@@ -2309,9 +2335,17 @@ void forecastWeatherLayoutDayX(Adafruit_ILI9341& tft, byte screen) {
 
 	drawBitmap(tft, SUNSET_Y, SUNSET_X, sunset, SUNSET_W, SUNSET_H);
 
+	tft.setFont();
+	tft.setTextSize(0);
+	tft.setTextColor(BLACK);
+	tft.setCursor(112, 215);
+	tft.printf("Moon");
+
+	tft.setFont();
+
 	drawBitmap(tft, WINDSPEEDICON_Y, WINDSPEEDICON_X, windSpeed, WINDSPEEDICON_W, WINDSPEEDICON_H);
 
-	drawBitmap(tft, WINDDIRECTIONICON_Y, WINDDIRECTIONICON_X, windDirection, WINDDIRECTIONICON_W, WINDDIRECTIONICON_H);
+	drawBitmap(tft, WINDDIRECTIONICON_Y, WINDDIRECTIONICON_X, weatherVain, WINDDIRECTIONICON_W, WINDDIRECTIONICON_H);
 
 	drawBitmap(tft, PRESSUREICON_Y, PRESSUREICON_X, pressure, PRESSUREICON_W, PRESSUREICON_H);
 
@@ -2518,7 +2552,7 @@ void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	tft.setFont();
 	tft.setTextSize(0);
 	tft.setTextColor(BLACK);
-	tft.setCursor(71, 215);
+	tft.setCursor(61, 215);
 	tft.printf("%s\n", buf);
 
 	tft.setFont();
@@ -2718,6 +2752,8 @@ void wiFiTitle() {
 
 /*-----------------------------------------------------------------*/
 
+// Draw hourly temperature chart.
+
 void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 	tft.setFont(&FreeSans9pt7b);
@@ -2813,6 +2849,8 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 /*-----------------------------------------------------------------*/
 
+// Draw hourly rain fall chart.
+
 void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 
 	tft.setFont(&FreeSans9pt7b);
@@ -2878,6 +2916,8 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// Draw hourly pressure chart.
 
 void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 
@@ -3057,6 +3097,47 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 	drawBarChartV2(tft, 4, 160, 210, 10, 170, loVal, hiVal, 20, pressureHr8, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
 
 	disableVSPIScreens();
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Draw main compass screen.
+
+void drawCompassChart(Adafruit_ILI9341& tft) {
+
+tft.fillScreen(WHITE);
+
+tft.setFont(&FreeSans9pt7b);
+tft.setTextSize(1);
+tft.setTextColor(BLACK, WHITE);
+tft.setCursor(5, 20);
+tft.print("Wind Direction");
+tft.setFont();
+
+drawBitmap(tft, 40, 228, weatherVainLrgBlk, 64, 64);
+
+if (windDirectionNow > 99) {
+
+	tft.setFont(&FreeSans12pt7b);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(235, 135);
+	tft.println(windDirectionNow);
+	tft.setFont();
+}
+
+else {
+
+	tft.setFont(&FreeSans12pt7b);
+	tft.setTextColor(BLACK, WHITE);
+	tft.setCursor(242, 135);
+	tft.println(windDirectionNow);
+	tft.setFont();
+}
+
+
+drawCompass(tft);
+drawNeedle(tft, windDirectionNow);
 
 } // Close function.
 

@@ -72,6 +72,12 @@
     <ClInclude Include="tftControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="drawCompass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iconsMoonPhase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="currentWeatherImage.cpp">
@@ -90,6 +96,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tftControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="drawCompass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

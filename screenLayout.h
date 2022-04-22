@@ -107,10 +107,16 @@
 #define SUNRISE_H 32
 
 // Sunset icon position and size.
-#define SUNSET_X 70
+#define SUNSET_X 60
 #define SUNSET_Y 180
 #define SUNSET_W 32
 #define SUNSET_H 32
+
+// Moon phase icon position and size.
+#define MOONPHASE_X 110
+#define MOONPHASE_Y 184
+#define MOONPHASE_W 26
+#define MOONPHASE_H 26
 
 // Sensor icon position and size.
 #define SENSOR_ICON_X 196
