@@ -126,8 +126,8 @@
 // WiFi icon position and size.
 #define WIFI_ICON_X 210
 #define WIFI_ICON_Y 13
-#define WIFI_ICON_W 16
-#define WIFI_ICON_H 16
+#define WIFI_ICON_W 32
+#define WIFI_ICON_H 32
 
 // Settings Cog position and size.
 #define SETTINGS_COG_X 233
