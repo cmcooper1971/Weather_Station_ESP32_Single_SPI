@@ -1356,12 +1356,14 @@ void loop() {
 
 				backLightState = true;
 				backLightToggled = true;
+				lastDebounceTime = millis();
 			}
 
 			else if (backLightState == true) {
 
 				backLightState = false;
 				backLightToggled = true;
+				lastDebounceTime = millis();
 			}
 		}
 	}
@@ -1378,12 +1380,14 @@ void loop() {
 
 				dailyHourlyState = true;
 				dailyHourlyToggled = true;
+				lastDebounceTime = millis();
 			}
 
 			else if (dailyHourlyState == true) {
 
 				dailyHourlyState = false;
 				dailyHourlyToggled = true;
+				lastDebounceTime = millis();
 			}
 		}
 	}
@@ -1400,12 +1404,14 @@ void loop() {
 
 				metricImperialState = true;
 				metricImperialToggled = true;
+				lastDebounceTime = millis();
 			}
 
 			else if (metricImperialState == true) {
 
 				metricImperialState = false;
 				metricImperialToggled = true;
+				lastDebounceTime = millis();
 			}
 		}
 
