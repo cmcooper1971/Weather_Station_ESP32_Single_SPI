@@ -399,14 +399,14 @@ double moonPhaseFc7;
 
 // Hourly forecast weather variables.
 
-int temperatureHr1;
-int temperatureHr2;
-int temperatureHr3;
-int temperatureHr4;
-int temperatureHr5;
-int temperatureHr6;
-int temperatureHr7;
-int temperatureHr8;
+double temperatureHr1;
+double temperatureHr2;
+double temperatureHr3;
+double temperatureHr4;
+double temperatureHr5;
+double temperatureHr6;
+double temperatureHr7;
+double temperatureHr8;
 
 double rainFallHr1;
 double rainFallHr2;
@@ -2874,7 +2874,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 		tempTempF = temperatureHr1;
 	}
 
-	else if (metricImperialState == true) {
+	else if (metricImperialState == false) {
 
 		drawBitmap(tft, 40, 228, temperatureFLrgBlk, 64, 64);
 		tempTempF = (temperatureHr1 * 9 / 5) + 32;
