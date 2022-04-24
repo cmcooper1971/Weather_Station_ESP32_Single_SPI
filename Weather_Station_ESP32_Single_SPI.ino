@@ -64,7 +64,7 @@
 
 #define espTouchBackLight	14			// ESP touch pin - Backlight switch
 #define espTouchDailyHourly	12			// ESP touch pin - Daily / hourly switch
-#define espTouchMetricImperial	0		// ESP touch pin - Metric / imperial switch
+#define espTouchMetricImperial	2		// ESP touch pin - Metric / imperial switch
 
 // MCP23008 Interface.
 
@@ -178,13 +178,20 @@ String longitude = "1.299350";
 
 // Timer debounce
 
-long lastDebounceTime = 0;
-const long debounceDelay = 50;
+long lastDebounceTimeBkL = 0;				// Debounce timing for backlight
+const long debounceDelayBkL = 200;			// Debounce delay timing for backlight
+
+long lastDebounceTimeDH = 0;				// Debounce timing for day hourly change
+const long debounceDelayDH = 200;			// Debounce delay timing for day hourly change
+
+long lastDebounceTimeMI = 0;				// Debounce timing for metric imperial change
+const long debounceDelayMI = 200;			// Debounce delay timing for metric imperial change
+
 
 // Timer variables (check Open Weather).
 
-unsigned long intervalT = 0;
-unsigned long intervalTime = 300000;			// Reset to 300,000 when finished with design (5 minutes sleep time)
+unsigned long intervalTGetData = 0;
+const unsigned long intervalPGetData = 180000;			// Reset to 300,000 when finished with design (5 minutes sleep time)
 
 // Timer variables (check wifi).
 
@@ -201,8 +208,8 @@ unsigned long timerDelay = 30000;
 // Timer variables (changing temperature readings).
 
 boolean flagTempDisplayChange = false;
-unsigned long intervalTT = 0;
-unsigned long intervalTTime = 3000;
+unsigned long intervalTTempRotate = 0;
+const unsigned long intervalPTemp = 5000;
 
 // Touch variables.
 
@@ -210,6 +217,7 @@ const int touchThreshold = 20;
 int touchValueBackLight = 25;
 int touchValueDailyHourly = 25;
 int touchValueMetrixImperial = 25;
+
 
 // Weather variables.
 
@@ -227,7 +235,7 @@ char headingArray[8][3] = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
 
 // Wind speed description array.
 
-char windSpeedDescription[14][18] = { ", calm", ", light air", ", light breeze", ", gentle breeze", ", moderate breeze", ", freesh breeze", ", strong breeze", ", near gale", ", gale", ", sever gale", ", storm", ", violent storm", ", hurricane"};
+char windSpeedDescription[14][18] = { ", calm", ", light air", ", light breeze", ", gentle breeze", ", moderate breeze", ", freesh breeze", ", strong breeze", ", near gale", ", gale", ", sever gale", ", storm", ", violent storm", ", hurricane" };
 
 // Current weather variables.
 
@@ -878,7 +886,7 @@ void setup() {
 	// Send screen configuration.
 
 	//tft1.begin();
-	tft.begin(27000000); // 40000000 27000000
+	tft.begin(40000000); // 40000000 27000000
 	tft.setRotation(3);
 	tft.setCursor(0, 0);
 
@@ -1302,37 +1310,34 @@ void setup() {
 	// Layout screens & obtain data.
 
 	currentWeatherLayout();
-
-	forecastWeatherLayoutDayX(tft, 2);
-	forecastWeatherLayoutDayX(tft, 3);
-	forecastWeatherLayoutDayX(tft, 4);
-
-	forecastWeatherLayoutDayX(tft, 5);
-	forecastWeatherLayoutDayX(tft, 6);
-	forecastWeatherLayoutDayX(tft, 7);
-	forecastWeatherLayoutDayX(tft, 8);
-
 	currentWeatherTemp();
 	currentWeatherDataDisplay();
 
+	forecastWeatherLayoutDayX(tft, 2);
 	forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
 	forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1, moonPhaseFc1);
 
+	forecastWeatherLayoutDayX(tft, 3);
 	forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
 	forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2, moonPhaseFc2);
 
+	forecastWeatherLayoutDayX(tft, 4);
 	forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
 	forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3, moonPhaseFc3);
 
+	forecastWeatherLayoutDayX(tft, 5);
 	forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
 	forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
 
+	forecastWeatherLayoutDayX(tft, 6);
 	forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
 	forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
 
+	forecastWeatherLayoutDayX(tft, 7);
 	forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
 	forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
 
+	forecastWeatherLayoutDayX(tft, 8);
 	forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
 	forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
 
@@ -1350,20 +1355,20 @@ void loop() {
 
 	if (touchValueBackLight < touchThreshold) {
 
-		if ((millis() - lastDebounceTime) > debounceDelay)
+		if ((millis() - lastDebounceTimeBkL) > debounceDelayBkL)
 		{
 			if (backLightState == false) {
 
 				backLightState = true;
 				backLightToggled = true;
-				lastDebounceTime = millis();
+				lastDebounceTimeBkL = millis();
 			}
 
 			else if (backLightState == true) {
 
 				backLightState = false;
 				backLightToggled = true;
-				lastDebounceTime = millis();
+				lastDebounceTimeBkL = millis();
 			}
 		}
 	}
@@ -1374,20 +1379,20 @@ void loop() {
 
 	if (touchValueDailyHourly < touchThreshold) {
 
-		if ((millis() - lastDebounceTime) > debounceDelay)
+		if ((millis() - lastDebounceTimeDH) > debounceDelayDH)
 		{
 			if (dailyHourlyState == false) {
 
 				dailyHourlyState = true;
 				dailyHourlyToggled = true;
-				lastDebounceTime = millis();
+				lastDebounceTimeDH = millis();
 			}
 
 			else if (dailyHourlyState == true) {
 
 				dailyHourlyState = false;
 				dailyHourlyToggled = true;
-				lastDebounceTime = millis();
+				lastDebounceTimeDH = millis();
 			}
 		}
 	}
@@ -1398,20 +1403,20 @@ void loop() {
 
 	if (touchValueMetrixImperial < touchThreshold) {
 
-		if ((millis() - lastDebounceTime) > debounceDelay)
+		if ((millis() - lastDebounceTimeMI) > debounceDelayMI)
 		{
 			if (metricImperialState == false) {
 
 				metricImperialState = true;
 				metricImperialToggled = true;
-				lastDebounceTime = millis();
+				lastDebounceTimeMI = millis();
 			}
 
 			else if (metricImperialState == true) {
 
 				metricImperialState = false;
 				metricImperialToggled = true;
-				lastDebounceTime = millis();
+				lastDebounceTimeMI = millis();
 			}
 		}
 
@@ -1419,7 +1424,7 @@ void loop() {
 
 	// Check Open Weather at regular intervals.
 
-	if (millis() >= intervalT + intervalTime) {
+	if (millis() >= intervalTGetData + intervalPGetData) {
 
 		// Update time.
 
@@ -1429,138 +1434,125 @@ void loop() {
 
 		getWeatherData();
 
-		intervalTime = 60000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
-		intervalT = millis();
+		intervalTGetData = millis();
 
 	}
 
-	if (millis() >= intervalTT + intervalTTime) {
+	if (millis() >= intervalTTempRotate + intervalPTemp) {
 
 		// Alternate temperature displays, min, max, day, night.
 
-		if (flagTempDisplayChange == false) {
-
-			flagTempDisplayChange = true;
-			currentWeatherTemp();
-
-			if (dailyHourlyState == false) {
-
-				if (dailyHourlyToggled == true) {
-
-					enableScreen5();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 5);
-					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
-
-					enableScreen6();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 6);
-					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
-
-					enableScreen7();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 7);
-					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
-
-					enableScreen8();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 8);
-					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
-
-					dailyHourlyToggled = false;
-				}
-
-				forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
-				forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
-				forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
-				forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
-			}
-
-			forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
-			forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
-			forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
-
-		}
-
-		else if (flagTempDisplayChange == true) {
+		if (flagTempDisplayChange == true) {
 
 			flagTempDisplayChange = false;
-			currentWeatherTemp();
+		}
 
-			if (dailyHourlyState == false) {
+		else flagTempDisplayChange = true;
 
-				if (dailyHourlyToggled == true) {
+		currentWeatherTemp();
 
-					enableScreen5();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 5);
-					forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
+		// Check if daily / hourly flag set and change displays.
 
-					enableScreen6();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 6);
-					forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
+		if (dailyHourlyState == false) {
 
-					enableScreen7();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 7);
-					forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
+			if (dailyHourlyToggled == true) {
 
-					enableScreen8();
-					tft.fillScreen(WHITE);
-					forecastWeatherLayoutDayX(tft, 8);
-					forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
+				enableScreen5();
+				tft.fillScreen(WHITE);
+				forecastWeatherLayoutDayX(tft, 5);
+				forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
 
+				enableScreen6();
+				tft.fillScreen(WHITE);
+				forecastWeatherLayoutDayX(tft, 6);
+				forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
 
-					dailyHourlyToggled = false;
-				}
+				enableScreen7();
+				tft.fillScreen(WHITE);
+				forecastWeatherLayoutDayX(tft, 7);
+				forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
 
-				forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
-				forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
-				forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
-				forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
+				enableScreen8();
+				tft.fillScreen(WHITE);
+				forecastWeatherLayoutDayX(tft, 8);
+				forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
+
+				dailyHourlyToggled = false;
+
 			}
 
-			forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
-			forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
-			forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
+			forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
+			forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
+			forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
+			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
 
 		}
 
-		intervalTTime = 3000; // After restart, once Setup has loaded, lenghten update interval to 5 mins (this needs changing when build is 100%)
-		intervalTT = millis();
+		forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
+		forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
+		forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
+
+		intervalTTempRotate = millis();
 
 	}
 
-	if (dailyHourlyState == true) {
+	if (dailyHourlyState == true && dailyHourlyToggled == true) {
 
-		if (dailyHourlyToggled == true) {
+		enableScreen5();
+		tft.fillScreen(WHITE);
+		drawHourlyTempChart(tft);
+		disableVSPIScreens();
 
-			enableScreen5();
-			tft.fillScreen(WHITE);
-			drawHourlyTempChart(tft);
-			disableVSPIScreens();
+		enableScreen6();
+		tft.fillScreen(WHITE);
+		drawHourlyRainChart(tft);
+		disableVSPIScreens();
 
-			enableScreen6();
-			tft.fillScreen(WHITE);
-			drawHourlyRainChart(tft);
-			disableVSPIScreens();
+		enableScreen7();
+		tft.fillScreen(WHITE);
+		drawHourlyPressureChart(tft);
+		disableVSPIScreens();
 
-			enableScreen7();
-			tft.fillScreen(WHITE);
-			drawHourlyPressureChart(tft);
-			disableVSPIScreens();
+		enableScreen8();
+		tft.fillScreen(WHITE);
+		drawCompassChart(tft);
+		disableVSPIScreens();
 
-			enableScreen8();
-			tft.fillScreen(WHITE);
-			drawCompassChart(tft);
-			disableVSPIScreens();
-
-			dailyHourlyToggled = false;
-
-		}
+		dailyHourlyToggled = false;
 
 	}
+
+	else if (dailyHourlyState == false && dailyHourlyToggled == true) {
+
+		enableScreen5();
+		tft.fillScreen(WHITE);
+		forecastWeatherLayoutDayX(tft, 5);
+		forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
+		forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
+
+		enableScreen6();
+		tft.fillScreen(WHITE);
+		forecastWeatherLayoutDayX(tft, 6);
+		forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
+		forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
+
+		enableScreen7();
+		tft.fillScreen(WHITE);
+		forecastWeatherLayoutDayX(tft, 7);
+		forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
+		forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
+
+		enableScreen8();
+		tft.fillScreen(WHITE);
+		forecastWeatherLayoutDayX(tft, 8);
+		forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
+		forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
+
+		dailyHourlyToggled = false;
+
+	}
+
+	// Control back lights
 
 	if (backLightState == true) {
 
@@ -1587,7 +1579,7 @@ void loop() {
 		backLightToggled = false;
 	}
 
-	if (backLightState == false) {
+	else if (backLightState == false) {
 
 		if (backLightToggled == true) {
 
@@ -1609,6 +1601,13 @@ void loop() {
 		}
 
 		backLightToggled = false;
+	}
+
+	if (metricImperialToggled == true) {
+
+		metriximperialSwitch();
+
+		metricImperialToggled = false;
 	}
 
 } // Close loop.
@@ -1984,7 +1983,7 @@ void currentWeatherLayout() {
 
 	if (metricImperialState == true) {
 
-	drawBitmap(tft, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterC, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
+		drawBitmap(tft, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterC, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
 
 	}
 
@@ -2085,14 +2084,13 @@ void currentWeatherDataDisplay() {
 	tft.setTextSize(0);
 	tft.setCursor(PRESSUREVALUE_X + 4, PRESSUREVALUE_Y + 5);
 	tft.print("mbar");
-	
+
 	// Humidity section.
 
 	tft.setFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
 	tft.setCursor(HUMIDITYVALUE_X, HUMIDITYVALUE_Y);
 	tft.print(tempHumidity);
-	tft.print("%");
 
 	// Wind speed section.
 
@@ -2349,7 +2347,7 @@ void forecastWeatherLayoutDayX(Adafruit_ILI9341& tft, byte screen) {
 
 	if (metricImperialState == true) {
 
-	drawBitmap(tft, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterC, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
+		drawBitmap(tft, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterC, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
 
 	}
 
@@ -2456,7 +2454,6 @@ void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	tft.setFont(&FreeSans9pt7b);
 	tft.setCursor(HUMIDITYVALUE_X, HUMIDITYVALUE_Y);
 	tft.print(tempHumidity);
-	tft.print("%");
 
 	// Wind speed section.
 
@@ -2612,6 +2609,7 @@ void forecastDataDisplayTempDayX(Adafruit_ILI9341& tft, byte screen, unsigned lo
 		tft.fillRect(TEMPERATUREVALUE_X, 30, 110, 40, WHITE);
 		tft.fillRect(0, 0, 320, 25, WHITE);
 
+		tft.setTextSize(0);
 		tft.setTextColor(BLACK, WHITE);
 		tft.setFont(&FreeSans9pt7b);
 		tft.setCursor(TEMPERATUREVALUE_X, TEMPERATUREVALUE_Y);
@@ -2642,6 +2640,7 @@ void forecastDataDisplayTempDayX(Adafruit_ILI9341& tft, byte screen, unsigned lo
 		tft.fillRect(TEMPERATUREVALUE_X, 30, 110, 40, WHITE);
 		tft.fillRect(0, 0, 320, 25, WHITE);
 
+		tft.setTextSize(0);
 		tft.setTextColor(BLUE);
 		tft.setFont(&FreeSans9pt7b);
 		tft.setCursor(TEMPERATUREVALUE_X, TEMPERATUREVALUE_Y);
@@ -2797,7 +2796,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 	if (metricImperialState == true) {
 
-	drawBitmap(tft, 40, 228, temperatureCLrgBlk, 64, 64);
+		drawBitmap(tft, 40, 228, temperatureCLrgBlk, 64, 64);
 
 	}
 
@@ -3225,6 +3224,75 @@ void drawBlackBox() {
 	disableVSPIScreens();
 
 } // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Reset all displays after switching from metric to imperial or vice versa.
+
+void metriximperialSwitch() {
+
+	// Layout screens & obtain data.
+
+	currentWeatherLayout();
+	currentWeatherTemp();
+	currentWeatherDataDisplay();
+
+	forecastWeatherLayoutDayX(tft, 2);
+	forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
+	forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1, moonPhaseFc1);
+
+	forecastWeatherLayoutDayX(tft, 3);
+	forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
+	forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2, moonPhaseFc2);
+
+	forecastWeatherLayoutDayX(tft, 4);
+	forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
+	forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3, moonPhaseFc3);
+
+
+	if (dailyHourlyState == true) {
+
+		enableScreen5();
+		drawHourlyTempChart(tft);
+		disableVSPIScreens();
+
+		enableScreen6();
+		drawHourlyRainChart(tft);
+		disableVSPIScreens();
+
+		enableScreen7();
+		drawHourlyPressureChart(tft);
+		disableVSPIScreens();
+
+		enableScreen8();
+		drawCompassChart(tft);
+		disableVSPIScreens();
+
+		dailyHourlyToggled = false;
+
+	}
+
+	else {
+
+		forecastWeatherLayoutDayX(tft, 5);
+		forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
+		forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
+
+		forecastWeatherLayoutDayX(tft, 6);
+		forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
+		forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
+
+		forecastWeatherLayoutDayX(tft, 7);
+		forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
+		forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
+
+		forecastWeatherLayoutDayX(tft, 8);
+		forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
+		forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
+
+	}
+
+}
 
 /*-----------------------------------------------------------------*/
 
