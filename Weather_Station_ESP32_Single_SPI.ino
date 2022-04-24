@@ -2079,18 +2079,20 @@ void currentWeatherDataDisplay() {
 
 		sprintf(tempTemp, "%2.0f%c%c", tempTempCF, 42, 'F'); // 42 is ASCII for degrees
 		sprintf(tempFeelsLikeTemp, "%2.0f%c%c", tempTempFLCF, 42, 'F');
-
+		drawBitmap(tft, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterF, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
 	}
 
 	else if (metricImperialState == true) {
 
 		sprintf(tempTemp, "%2.0f%c%c", tempNow, 42, 'C'); // 42 is ASCII for degrees
 		sprintf(tempFeelsLikeTemp, "%2.0f%c%c", feelsLikeTempNow, 42, 'C');
+		drawBitmap(tft, TEMPERATUREICONC_Y, TEMPERATUREICONC_X, thermonmeterC, TEMPERATUREICONC_W, TEMPERATUREICONC_H);
 
 	}
 
 	// Display data.
 
+	tft.setTextSize(0);
 	tft.setTextColor(BLACK, WHITE);
 	tft.setFont(&FreeSans9pt7b);
 	tft.setCursor(TEMPERATUREVALUE_X, TEMPERATUREVALUE_Y);
@@ -2864,13 +2866,20 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 	tft.print("Hourly Temperature");
 	tft.setFont();
 
+	double tempTempF;
+
 	if (metricImperialState == true) {
 
 		drawBitmap(tft, 40, 228, temperatureCLrgBlk, 64, 64);
-
+		tempTempF = temperatureHr1;
 	}
 
-	else drawBitmap(tft, 40, 228, temperatureFLrgBlk, 64, 64);
+	else if (metricImperialState == true) {
+
+		drawBitmap(tft, 40, 228, temperatureFLrgBlk, 64, 64);
+		tempTempF = (temperatureHr1 * 9 / 5) + 32;
+	}
+	
 
 	tft.setTextSize(1);
 	tft.setTextColor(GREY, WHITE);
@@ -2883,7 +2892,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
 		tft.setCursor(240, 135);
-		tft.println(temperatureHr1);
+		tft.println(tempTempF);
 	}
 
 	else if (temperatureHr1 >= 0) {
@@ -2891,7 +2900,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
 		tft.setCursor(247, 135);
-		tft.println(temperatureHr1);
+		tft.println(tempTempF);
 	}
 
 	else if (temperatureHr1 <= -10) {
@@ -2899,7 +2908,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
 		tft.setCursor(235, 135);
-		tft.println(temperatureHr1);
+		tft.println(tempTempF);
 	}
 
 
@@ -2908,7 +2917,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextColor(BLACK, WHITE);
 		tft.setCursor(243, 135);
-		tft.println(temperatureHr1);
+		tft.println(tempTempF);
 	}
 
 	tft.setFont();
@@ -3301,24 +3310,15 @@ void drawBlackBox() {
 
 void metriximperialSwitch() {
 
-	// Layout screens & obtain data.
+	// Update temperature by rerunning functions.
 
-	currentWeatherLayout();
-	currentWeatherTemp();
 	currentWeatherDataDisplay();
 
-	//forecastWeatherLayoutDayX(tft, 2);
 	forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
-	//forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1, moonPhaseFc1);
-
-	//forecastWeatherLayoutDayX(tft, 3);
 	forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
-	//forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2, moonPhaseFc2);
-
-	//forecastWeatherLayoutDayX(tft, 4);
 	forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
-	//forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3, moonPhaseFc3);
-
+	
+	// Update hourly view if set.
 
 	if (dailyHourlyState == true) {
 
@@ -3342,27 +3342,18 @@ void metriximperialSwitch() {
 
 	}
 
+	// Otherwise update daily view.
+
 	else {
 
-		//forecastWeatherLayoutDayX(tft, 5);
 		forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
-		//forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
-
-		//forecastWeatherLayoutDayX(tft, 6);
 		forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
-		//forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
-
-		//forecastWeatherLayoutDayX(tft, 7);
 		forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
-		//forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
-
-		//forecastWeatherLayoutDayX(tft, 8);
 		forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
-		//forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
-
+		
 	}
 
-}
+} // Close function.
 
 /*-----------------------------------------------------------------*/
 
