@@ -1245,19 +1245,17 @@ void setup() {
 
 	enableScreen1();
 
-	// Draw border and buttons at start.
+	// Draw grid for space screen design
 
-	drawBorder();
+	//for (int x = 20; x < 320; x = x + 20) {
 
-	for (int x = 20; x < 320; x = x + 20) {
+	//	tft.drawFastVLine(x, 0, 240, BLACK);
+	//}
 
-		tft.drawFastVLine(x, 0, 240, BLACK);
-	}
+	//for (int x = 20; x < 240; x = x + 20) {
 
-	for (int x = 20; x < 240; x = x + 20) {
-
-		tft.drawFastHLine(0, x, 320, BLACK);
-	}
+	//	tft.drawFastHLine(0, x, 320, BLACK);
+	//}
 
 	disableVSPIScreens();
 
@@ -1311,7 +1309,7 @@ void setup() {
 
 	currentWeatherLayout();
 	currentWeatherTemp();
-	currentWeatherDataDisplay();
+	currentWeatherDataDisplay(moonPhaseNow);
 
 	forecastWeatherLayoutDayX(tft, 2);
 	forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
@@ -1605,7 +1603,7 @@ void loop() {
 
 	if (metricImperialToggled == true) {
 
-		metriximperialSwitch();
+		metricImperialSwitch();
 
 		metricImperialToggled = false;
 	}
@@ -2019,7 +2017,7 @@ void currentWeatherLayout() {
 
 // Display current weather data.
 
-void currentWeatherDataDisplay() {
+void currentWeatherDataDisplay(double moonPhaseFc) {
 
 	// Format humidity readings for display.
 
@@ -2203,7 +2201,7 @@ void currentWeatherDataDisplay() {
 
 	// Moon phase section.
 
-	drawCurrentMoonPhase();
+	drawDailyMoonPhase(moonPhaseFc);
 
 	disableVSPIScreens();
 
@@ -2859,6 +2857,18 @@ void wiFiTitle() {
 
 void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
+	// Draw grid for space screen design
+
+	//for (int x = 20; x < 320; x = x + 20) {
+
+	//	tft.drawFastVLine(x, 0, 240, BLACK);
+	//}
+
+	//for (int x = 20; x < 240; x = x + 20) {
+
+	//	tft.drawFastHLine(0, x, 320, BLACK);
+	//}
+
 	tft.setFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
 	tft.setTextColor(BLACK, WHITE);
@@ -2866,59 +2876,50 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 	tft.print("Hourly Temperature");
 	tft.setFont();
 
-	double tempTempF;
+	double tempTemp;
 
 	if (metricImperialState == true) {
 
 		drawBitmap(tft, 40, 228, temperatureCLrgBlk, 64, 64);
-		tempTempF = temperatureHr1;
+		tempTemp = temperatureHr1;
+
+		if (tempTemp < 10.00 && tempTemp > -10.00) {
+
+			tft.setFont(&FreeSans12pt7b);
+			tft.setTextColor(BLACK, WHITE);
+			tft.setCursor(233, 135);
+			tft.println(tempTemp);
+			tft.setFont();
+		}
+
+		if (tempTemp > 9.00 ) {
+
+			tft.setFont(&FreeSans12pt7b);
+			tft.setTextColor(BLACK, WHITE);
+			tft.setCursor(230, 135);
+			tft.println(tempTemp);
+			tft.setFont();
+		}
+
 	}
 
 	else if (metricImperialState == false) {
 
 		drawBitmap(tft, 40, 228, temperatureFLrgBlk, 64, 64);
-		tempTempF = (temperatureHr1 * 9 / 5) + 32;
+		tempTemp = (temperatureHr1 * 9 / 5) + 32;
+
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextColor(BLACK, WHITE);
+		tft.setCursor(228, 135);
+		tft.println(tempTemp);
+		tft.setFont();
 	}
-	
 
 	tft.setTextSize(1);
-	tft.setTextColor(GREY, WHITE);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(60, 228);
 	tft.println("Current + hr");
 	tft.setFont();
-
-	if (temperatureHr1 > 9) {
-
-		tft.setFont(&FreeSans12pt7b);
-		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(240, 135);
-		tft.println(tempTempF);
-	}
-
-	else if (temperatureHr1 >= 0) {
-
-		tft.setFont(&FreeSans12pt7b);
-		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(247, 135);
-		tft.println(tempTempF);
-	}
-
-	else if (temperatureHr1 <= -10) {
-
-		tft.setFont(&FreeSans12pt7b);
-		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(235, 135);
-		tft.println(tempTempF);
-	}
-
-
-	else if (temperatureHr1 <= 0) {
-
-		tft.setFont(&FreeSans12pt7b);
-		tft.setTextColor(BLACK, WHITE);
-		tft.setCursor(243, 135);
-		tft.println(tempTempF);
-	}
 
 	tft.setFont();
 	tft.setTextSize(1);
@@ -2927,37 +2928,92 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 	tft.println("Degrees");
 	tft.setFont();
 
-	int loVal = -30;
-	int hiVal = 45;
+	int loVal;
+	int hiVal;
 
+	double tempTemp1;
+	double tempTemp2;
+	double tempTemp3;
+	double tempTemp4;
+	double tempTemp5;
+	double tempTemp6;
+	double tempTemp7;
+	double tempTemp8;
 
-	if (temperatureHr1 > 15) {
+	// Adjust graph scales for celsius
 
-		loVal = 10;
-		hiVal = 45;
+	if (metricImperialState == true) {
+
+		tempTemp1 = temperatureHr1;
+		tempTemp2 = temperatureHr2;
+		tempTemp3 = temperatureHr3;
+		tempTemp4 = temperatureHr4;
+		tempTemp5 = temperatureHr5;
+		tempTemp6 = temperatureHr6;
+		tempTemp7 = temperatureHr7;
+		tempTemp8 = temperatureHr8;
+
+		if (tempTemp1 > 15) {
+
+			loVal = 10;
+			hiVal = 45;
+		}
+
+		else if (tempTemp1 > -10 && tempTemp1 <= 15) {
+
+			loVal = -10;
+			hiVal = 25;
+		}
+
+		else if (tempTemp1 < -10) {
+
+			loVal = -30;
+			hiVal = 5;
+		}
+
 	}
 
-	else if (temperatureHr1 > -10 && temperatureHr1 <= 15) {
+	// Adjust graph scales for fahrenheit
 
-		loVal = -10;
-		hiVal = 25;
+	else {
+
+		tempTemp1 = (temperatureHr1 * 9 / 5) + 32;
+		tempTemp2 = (temperatureHr2 * 9 / 5) + 32;
+		tempTemp3 = (temperatureHr3 * 9 / 5) + 32;
+		tempTemp4 = (temperatureHr4 * 9 / 5) + 32;
+		tempTemp5 = (temperatureHr5 * 9 / 5) + 32;
+		tempTemp6 = (temperatureHr6 * 9 / 5) + 32;
+		tempTemp7 = (temperatureHr7 * 9 / 5) + 32;
+		tempTemp8 = (temperatureHr8 * 9 / 5) + 32;
+
+		if (tempTemp1 > -11.2 && tempTemp1 < 32.1) {
+
+			loVal = -15;
+			hiVal = 45;
+		}
+
+		else if (tempTemp1 > 32.00 && tempTemp1 < 77.00) {
+
+			loVal = 25;
+			hiVal = 85;
+		}
+
+		else if (tempTemp1 > 77.00 && tempTemp1 < 122.00) {
+
+			loVal = 65;
+			hiVal = 120;
+		}
+
 	}
 
-	else if (temperatureHr1 < -10) {
-
-		loVal = -30;
-		hiVal = 5;
-	}
-
-
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, loVal, hiVal, 5, temperatureHr1, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, loVal, hiVal, 5, temperatureHr2, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, loVal, hiVal, 5, temperatureHr3, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, loVal, hiVal, 5, temperatureHr4, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, loVal, hiVal, 5, temperatureHr5, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, loVal, hiVal, 5, temperatureHr6, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, loVal, hiVal, 5, temperatureHr7, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, loVal, hiVal, 5, temperatureHr8, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, loVal, hiVal, 5, tempTemp1, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, loVal, hiVal, 5, tempTemp2, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, loVal, hiVal, 5, tempTemp3, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, loVal, hiVal, 5, tempTemp4, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, loVal, hiVal, 5, tempTemp5, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, loVal, hiVal, 5, tempTemp6, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, loVal, hiVal, 5, tempTemp7, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, loVal, hiVal, 5, tempTemp8, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", graph_8);
 
 	disableVSPIScreens();
 
@@ -2979,13 +3035,13 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 	drawBitmap(tft, 40, 228, rainFallLrgBlk, 64, 64);
 
 	tft.setTextSize(1);
-	tft.setTextColor(GREY, WHITE);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(202, 206);
 	tft.println("mm");
 	tft.setFont();
 
 	tft.setTextSize(1);
-	tft.setTextColor(GREY, WHITE);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(60, 228);
 	tft.println("Current + hr");
 	tft.setFont();
@@ -3020,16 +3076,37 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 	int rainFallHr7Int = rainFallHr7 + 0.5;
 	int rainFallHr8Int = rainFallHr8 + 0.5;
 
+	int hiVal;
+	int increments;
+
+	if (rainFallHr1Int < 10) {
+
+		hiVal = 10;
+		increments = 1;
+	}
+
+	else if (rainFallHr1Int < 45) {
+
+		hiVal = 50;
+		increments = 5;
+	}
+
+	else if (rainFallHr1Int <= 100) {
+
+		hiVal = 100;
+		increments = 10;
+	}
+
 	// Insert scale change including intervals
 
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, 10, 1, rainFallHr1Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, 10, 1, rainFallHr2Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, 10, 1, rainFallHr3Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, 10, 1, rainFallHr4Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, 10, 1, rainFallHr5Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, 10, 1, rainFallHr6Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, 10, 1, rainFallHr7Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, 10, 1, rainFallHr8Int, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", graph_8);
 
 	disableVSPIScreens();
 
@@ -3051,7 +3128,7 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 	drawBitmap(tft, 40, 228, pressureLrgBlk, 64, 64);
 
 	tft.setTextSize(1);
-	tft.setTextColor(GREY, WHITE);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(60, 228);
 	tft.println("Current + hr");
 	tft.setFont();
@@ -3207,14 +3284,14 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 		hiVal = 1000;
 	}
 
-	drawBarChartV1(tft, 4, 20, 210, 10, 170, loVal, hiVal, 20, pressureHr1, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "C", graph_1);
-	drawBarChartV1(tft, 4, 40, 210, 10, 170, loVal, hiVal, 20, pressureHr2, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+1", graph_2);
-	drawBarChartV1(tft, 4, 60, 210, 10, 170, loVal, hiVal, 20, pressureHr3, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+2", graph_3);
-	drawBarChartV1(tft, 4, 80, 210, 10, 170, loVal, hiVal, 20, pressureHr4, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+3", graph_4);
-	drawBarChartV1(tft, 4, 100, 210, 10, 170, loVal, hiVal, 20, pressureHr5, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+4", graph_5);
-	drawBarChartV1(tft, 4, 120, 210, 10, 170, loVal, hiVal, 20, pressureHr6, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+5", graph_6);
-	drawBarChartV1(tft, 4, 140, 210, 10, 170, loVal, hiVal, 20, pressureHr7, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+6", graph_7);
-	drawBarChartV2(tft, 4, 160, 210, 10, 170, loVal, hiVal, 20, pressureHr8, 2, 0, LTBLUE, WHITE, GREY, GREY, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 4, 20, 210, 10, 170, loVal, hiVal, 20, pressureHr1, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", graph_1);
+	drawBarChartV1(tft, 4, 40, 210, 10, 170, loVal, hiVal, 20, pressureHr2, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", graph_2);
+	drawBarChartV1(tft, 4, 60, 210, 10, 170, loVal, hiVal, 20, pressureHr3, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", graph_3);
+	drawBarChartV1(tft, 4, 80, 210, 10, 170, loVal, hiVal, 20, pressureHr4, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", graph_4);
+	drawBarChartV1(tft, 4, 100, 210, 10, 170, loVal, hiVal, 20, pressureHr5, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", graph_5);
+	drawBarChartV1(tft, 4, 120, 210, 10, 170, loVal, hiVal, 20, pressureHr6, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", graph_6);
+	drawBarChartV1(tft, 4, 140, 210, 10, 170, loVal, hiVal, 20, pressureHr7, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", graph_7);
+	drawBarChartV2(tft, 4, 160, 210, 10, 170, loVal, hiVal, 20, pressureHr8, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", graph_8);
 
 	disableVSPIScreens();
 
@@ -3308,21 +3385,22 @@ void drawBlackBox() {
 
 // Reset all displays after switching from metric to imperial or vice versa.
 
-void metriximperialSwitch() {
+void metricImperialSwitch() {
 
 	// Update temperature by rerunning functions.
 
-	currentWeatherDataDisplay();
+	currentWeatherDataDisplay(moonPhaseNow);
 
 	forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
 	forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
 	forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
-	
+
 	// Update hourly view if set.
 
 	if (dailyHourlyState == true) {
 
 		enableScreen5();
+		tft.fillScreen(WHITE);
 		drawHourlyTempChart(tft);
 		disableVSPIScreens();
 
@@ -3350,85 +3428,6 @@ void metriximperialSwitch() {
 		forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
 		forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
 		forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
-		
-	}
-
-} // Close function.
-
-/*-----------------------------------------------------------------*/
-
-// Draw current moon phase.
-
-void drawCurrentMoonPhase() {
-
-	if (moonPhaseNow == 0 || moonPhaseNow == 1) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, newMoon, MOONPHASE_W, MOONPHASE_H);
-	}
-
-	else if (moonPhaseNow > 0 && moonPhaseNow < 0.15) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingCrescentMoon1, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow >= 0.15 && moonPhaseNow < 0.25) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingCrescentMoon2, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow == 0.25) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, firstQuarterMoon, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow > 0.25 && moonPhaseNow < 0.35) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingGibbousMoon1, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow >= 0.35 && moonPhaseNow < 0.5) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waxingGibbousMoon2, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow == 0.5) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, fullMoon, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow > 0.50 && moonPhaseNow < 0.65) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningGibbousMoon1, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow >= 0.65 && moonPhaseNow < 0.75) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningGibbousMoon2, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow == 0.75) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, lastQuarterMoon, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow > 0.75 && moonPhaseNow < 0.85) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningCrescentMoon1, MOONPHASE_W, MOONPHASE_H);
-
-	}
-
-	else if (moonPhaseNow >= 0.85 && moonPhaseNow < 1) {
-
-		drawBitmap(tft, MOONPHASE_Y, MOONPHASE_X, waningCrescentMoon2, MOONPHASE_W, MOONPHASE_H);
 
 	}
 
