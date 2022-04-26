@@ -9,7 +9,7 @@
 
 /*-----------------------------------------------------------------*/
 
-void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, double w, double h, double loval, double hival, double inc, int curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw)
+void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, double w, double h, double loval, double hival, double inc, int curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean fillBar, boolean& redraw)
 {
 
     double stepval, range;
@@ -50,7 +50,14 @@ void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
     tft.drawFastHLine(x, y + 1 - level, w, barcolor);
     tft.drawFastHLine(x, y + 1 - level - 1, w, barcolor);
     tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
-    //tft.fillRect(x, y + 1 - level, w,  level, barcolor);
+    
+    if (fillBar == 1) {
+
+        tft.fillRect(x, y + 1 - level, w,  level, barcolor);
+    }
+    
+    else {}
+
     // write the current value
     /*
       tft.setTextColor(textcolor, backcolor);
@@ -62,7 +69,7 @@ void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
 
 /*-----------------------------------------------------------------*/
 
-void drawBarChartV2(Adafruit_ILI9341& tft, byte screen, double x, double y, double w, double h, double loval, double hival, double inc, int curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw)
+void drawBarChartV2(Adafruit_ILI9341& tft, byte screen, double x, double y, double w, double h, double loval, double hival, double inc, int curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean fillBar, boolean& redraw)
 {
 
     double stepval, range;
@@ -103,6 +110,14 @@ void drawBarChartV2(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
     tft.drawFastHLine(x, y + 1 - level, w, barcolor);
     tft.drawFastHLine(x, y + 1 - level - 1, w, barcolor);
     tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
+
+    if (fillBar == 1) {
+
+        tft.fillRect(x, y + 1 - level, w, level, barcolor);
+    }
+
+    else {}
+
     // write the current value
     /*
       tft.setTextColor(textcolor, backcolor);

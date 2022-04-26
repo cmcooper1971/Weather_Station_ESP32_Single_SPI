@@ -417,6 +417,8 @@ double rainFallHr6;
 double rainFallHr7;
 double rainFallHr8;
 
+double rainChartScale;
+
 unsigned int pressureHr1;
 unsigned int pressureHr2;
 unsigned int pressureHr3;
@@ -1550,56 +1552,7 @@ void loop() {
 
 	}
 
-	// Control back lights
-
-	if (backLightState == true) {
-
-		if (backLightToggled == true) {
-
-			mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
-
-		}
-
-		backLightToggled = false;
-	}
-
-	else if (backLightState == false) {
-
-		if (backLightToggled == true) {
-
-			mcp.digitalWrite(TFT_LED1_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED2_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED3_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED4_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED5_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED6_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED7_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED8_CTRL, LOW);
-		}
-
-		backLightToggled = false;
-	}
+	// Detect if metric / imperial change.
 
 	if (metricImperialToggled == true) {
 
@@ -1608,6 +1561,16 @@ void loop() {
 		metricImperialToggled = false;
 	}
 
+	// Detect if backlight control change.
+
+	if (backLightToggled == true) {
+
+		controlBackLight();
+
+		backLightToggled = false;
+
+	}
+		
 } // Close loop.
 
 /*-----------------------------------------------------------------*/
@@ -1705,6 +1668,63 @@ void getWeatherData() {
 	rainFallHr6 = (myObject["hourly"][6]["rain"]["1h"]);
 	rainFallHr7 = (myObject["hourly"][7]["rain"]["1h"]);
 	rainFallHr8 = (myObject["hourly"][8]["rain"]["1h"]);
+
+	rainFallHr1 = 10.00;
+	rainFallHr2 = 15.00;
+	rainFallHr3 = 20.00;
+	rainFallHr4 = 25.00;
+	rainFallHr5 = 30.00;
+	rainFallHr6 = 35.00;
+	rainFallHr7 = 40.00;
+	rainFallHr8 = 45.00;
+
+	// Set hourly chart scale.
+
+	if (rainFallHr1 > rainChartScale) {
+
+		rainChartScale = rainFallHr1;
+	}
+
+	if (rainFallHr2 > rainChartScale) {
+
+		rainChartScale = rainFallHr2;
+	}
+
+
+	if (rainFallHr3 > rainChartScale) {
+
+		rainChartScale = rainFallHr3;
+	}
+
+
+	if (rainFallHr4 > rainChartScale) {
+
+		rainChartScale = rainFallHr4;
+	}
+
+
+	if (rainFallHr5 > rainChartScale) {
+
+		rainChartScale = rainFallHr5;
+	}
+
+
+	if (rainFallHr6 > rainChartScale) {
+
+		rainChartScale = rainFallHr6;
+	}
+
+
+	if (rainFallHr7 > rainChartScale) {
+
+		rainChartScale = rainFallHr7;
+	}
+
+
+	if (rainFallHr8 > rainChartScale) {
+
+		rainChartScale = rainFallHr8;
+	}
 
 	pressureHr1 = (myObject["hourly"][1]["pressure"]);
 	pressureHr2 = (myObject["hourly"][2]["pressure"]);
@@ -2892,7 +2912,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 			tft.setFont();
 		}
 
-		if (tempTemp > 9.00 ) {
+		if (tempTemp > 9.00) {
 
 			tft.setFont(&FreeSans12pt7b);
 			tft.setTextColor(BLACK, WHITE);
@@ -3006,14 +3026,14 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 	}
 
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, loVal, hiVal, 5, tempTemp1, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, loVal, hiVal, 5, tempTemp2, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, loVal, hiVal, 5, tempTemp3, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, loVal, hiVal, 5, tempTemp4, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, loVal, hiVal, 5, tempTemp5, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, loVal, hiVal, 5, tempTemp6, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, loVal, hiVal, 5, tempTemp7, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, loVal, hiVal, 5, tempTemp8, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, loVal, hiVal, 5, tempTemp1, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "C", 0, graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, loVal, hiVal, 5, tempTemp2, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+1", 0, graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, loVal, hiVal, 5, tempTemp3, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+2", 0, graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, loVal, hiVal, 5, tempTemp4, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+3", 0, graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, loVal, hiVal, 5, tempTemp5, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+4", 0, graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, loVal, hiVal, 5, tempTemp6, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+5", 0, graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, loVal, hiVal, 5, tempTemp7, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+6", 0, graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, loVal, hiVal, 5, tempTemp8, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+7", 0, graph_8);
 
 	disableVSPIScreens();
 
@@ -3079,19 +3099,19 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 	int hiVal;
 	int increments;
 
-	if (rainFallHr1Int < 10) {
+	if (rainChartScale < 10) {
 
 		hiVal = 10;
 		increments = 1;
 	}
 
-	else if (rainFallHr1Int < 45) {
+	else if (rainChartScale < 50) {
 
 		hiVal = 50;
 		increments = 5;
 	}
 
-	else if (rainFallHr1Int <= 100) {
+	else if (rainChartScale <= 100) {
 
 		hiVal = 100;
 		increments = 10;
@@ -3099,14 +3119,14 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 
 	// Insert scale change including intervals
 
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", 1, graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", 1, graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", 1, graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", 1, graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", 1, graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", 1, graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", 1, graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", 1, graph_8);
 
 	disableVSPIScreens();
 
@@ -3284,14 +3304,14 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 		hiVal = 1000;
 	}
 
-	drawBarChartV1(tft, 4, 20, 210, 10, 170, loVal, hiVal, 20, pressureHr1, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", graph_1);
-	drawBarChartV1(tft, 4, 40, 210, 10, 170, loVal, hiVal, 20, pressureHr2, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", graph_2);
-	drawBarChartV1(tft, 4, 60, 210, 10, 170, loVal, hiVal, 20, pressureHr3, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", graph_3);
-	drawBarChartV1(tft, 4, 80, 210, 10, 170, loVal, hiVal, 20, pressureHr4, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", graph_4);
-	drawBarChartV1(tft, 4, 100, 210, 10, 170, loVal, hiVal, 20, pressureHr5, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", graph_5);
-	drawBarChartV1(tft, 4, 120, 210, 10, 170, loVal, hiVal, 20, pressureHr6, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", graph_6);
-	drawBarChartV1(tft, 4, 140, 210, 10, 170, loVal, hiVal, 20, pressureHr7, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", graph_7);
-	drawBarChartV2(tft, 4, 160, 210, 10, 170, loVal, hiVal, 20, pressureHr8, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", graph_8);
+	drawBarChartV1(tft, 4, 20, 210, 10, 170, loVal, hiVal, 20, pressureHr1, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", 0, graph_1);
+	drawBarChartV1(tft, 4, 40, 210, 10, 170, loVal, hiVal, 20, pressureHr2, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", 0, graph_2);
+	drawBarChartV1(tft, 4, 60, 210, 10, 170, loVal, hiVal, 20, pressureHr3, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", 0, graph_3);
+	drawBarChartV1(tft, 4, 80, 210, 10, 170, loVal, hiVal, 20, pressureHr4, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", 0, graph_4);
+	drawBarChartV1(tft, 4, 100, 210, 10, 170, loVal, hiVal, 20, pressureHr5, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", 0, graph_5);
+	drawBarChartV1(tft, 4, 120, 210, 10, 170, loVal, hiVal, 20, pressureHr6, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", 0, graph_6);
+	drawBarChartV1(tft, 4, 140, 210, 10, 170, loVal, hiVal, 20, pressureHr7, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", 0, graph_7);
+	drawBarChartV2(tft, 4, 160, 210, 10, 170, loVal, hiVal, 20, pressureHr8, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", 0, graph_8);
 
 	disableVSPIScreens();
 
@@ -3513,3 +3533,49 @@ void drawDailyMoonPhase(double moonPhaseFc) {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+void controlBackLight() {
+
+	// Control back lights
+
+	if (backLightState == true) {
+
+			mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
+			delay(100);
+			mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
+			delay(100);
+			mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
+			delay(100);
+			mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
+			delay(100);
+			mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
+			delay(100);
+			mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
+			delay(100);
+			mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
+			delay(100);
+			mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
+
+	}
+
+	else if (backLightState == false) {
+
+			mcp.digitalWrite(TFT_LED1_CTRL, LOW);
+			delay(100);
+			mcp.digitalWrite(TFT_LED2_CTRL, LOW);
+			delay(100);
+			mcp.digitalWrite(TFT_LED3_CTRL, LOW);
+			delay(100);
+			mcp.digitalWrite(TFT_LED4_CTRL, LOW);
+			delay(100);
+			mcp.digitalWrite(TFT_LED5_CTRL, LOW);
+			delay(100);
+			mcp.digitalWrite(TFT_LED6_CTRL, LOW);
+			delay(100);
+			mcp.digitalWrite(TFT_LED7_CTRL, LOW);
+			delay(100);
+			mcp.digitalWrite(TFT_LED8_CTRL, LOW);
+
+	}
+
+} // Close function.
