@@ -3026,14 +3026,14 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 	}
 
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, loVal, hiVal, 5, tempTemp1, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "C", 0, graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, loVal, hiVal, 5, tempTemp2, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+1", 0, graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, loVal, hiVal, 5, tempTemp3, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+2", 0, graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, loVal, hiVal, 5, tempTemp4, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+3", 0, graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, loVal, hiVal, 5, tempTemp5, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+4", 0, graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, loVal, hiVal, 5, tempTemp6, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+5", 0, graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, loVal, hiVal, 5, tempTemp7, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+6", 0, graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, loVal, hiVal, 5, tempTemp8, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+7", 0, graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, loVal, hiVal, 5, tempTemp1, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", 0, graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, loVal, hiVal, 5, tempTemp2, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", 0, graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, loVal, hiVal, 5, tempTemp3, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", 0, graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, loVal, hiVal, 5, tempTemp4, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", 0, graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, loVal, hiVal, 5, tempTemp5, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", 0, graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, loVal, hiVal, 5, tempTemp6, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", 0, graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, loVal, hiVal, 5, tempTemp7, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", 0, graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, loVal, hiVal, 5, tempTemp8, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", 0, graph_8);
 
 	disableVSPIScreens();
 
@@ -3119,14 +3119,14 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 
 	// Insert scale change including intervals
 
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", 1, graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", 1, graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", 1, graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", 1, graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", 1, graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", 1, graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", 1, graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 2, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", 1, graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "C", 1, graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+1", 1, graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+2", 1, graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+3", 1, graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+4", 1, graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+5", 1, graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+6", 1, graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+7", 1, graph_8);
 
 	disableVSPIScreens();
 
@@ -3540,40 +3540,32 @@ void controlBackLight() {
 
 	if (backLightState == true) {
 
+			mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
 			mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
 			delay(100);
+			mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
 			mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
 			delay(100);
+			mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
 			mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
 			delay(100);
-			mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
-			delay(100);
 			mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
+			mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
 
 	}
 
 	else if (backLightState == false) {
 
 			mcp.digitalWrite(TFT_LED1_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED2_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED3_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED4_CTRL, LOW);
-			delay(100);
 			mcp.digitalWrite(TFT_LED5_CTRL, LOW);
 			delay(100);
+			mcp.digitalWrite(TFT_LED2_CTRL, LOW);
 			mcp.digitalWrite(TFT_LED6_CTRL, LOW);
 			delay(100);
+			mcp.digitalWrite(TFT_LED3_CTRL, LOW);
 			mcp.digitalWrite(TFT_LED7_CTRL, LOW);
 			delay(100);
+			mcp.digitalWrite(TFT_LED4_CTRL, LOW);
 			mcp.digitalWrite(TFT_LED8_CTRL, LOW);
 
 	}
