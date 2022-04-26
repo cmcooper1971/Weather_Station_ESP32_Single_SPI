@@ -1605,7 +1605,6 @@ void getWeatherData() {
 	uvIndexNow = (myObject["current"]["uvi"]);
 	currentWeatherNow = (myObject["current"]["weather"][0]["id"]);
 	rainLevelNow = (myObject["current"]["rain"]["1h"]);
-	snowLevelNow = (myObject["current"]["snow"]);
 	sunRiseNow = (myObject["current"]["sunrise"]);
 	sunSetNow = (myObject["current"]["sunset"]);
 	moonPhaseNow = (myObject["daily"][0]["moon_phase"]);
@@ -1668,15 +1667,6 @@ void getWeatherData() {
 	rainFallHr6 = (myObject["hourly"][6]["rain"]["1h"]);
 	rainFallHr7 = (myObject["hourly"][7]["rain"]["1h"]);
 	rainFallHr8 = (myObject["hourly"][8]["rain"]["1h"]);
-
-	rainFallHr1 = 10.00;
-	rainFallHr2 = 15.00;
-	rainFallHr3 = 20.00;
-	rainFallHr4 = 25.00;
-	rainFallHr5 = 30.00;
-	rainFallHr6 = 35.00;
-	rainFallHr7 = 40.00;
-	rainFallHr8 = 45.00;
 
 	// Set hourly chart scale.
 
@@ -2912,7 +2902,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 			tft.setFont();
 		}
 
-		if (tempTemp > 9.00) {
+		if (tempTemp >= 10.00) {
 
 			tft.setFont(&FreeSans12pt7b);
 			tft.setTextColor(BLACK, WHITE);
@@ -3099,13 +3089,19 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 	int hiVal;
 	int increments;
 
-	if (rainChartScale < 10) {
+	if (rainChartScale <= 10) {
 
 		hiVal = 10;
 		increments = 1;
 	}
 
-	else if (rainChartScale < 50) {
+	else if (rainChartScale <= 250) {
+
+		hiVal = 25;
+		increments = 5;
+	}
+
+	else if (rainChartScale <= 50) {
 
 		hiVal = 50;
 		increments = 5;
@@ -3119,14 +3115,14 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 
 	// Insert scale change including intervals
 
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "C", 1, graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+1", 1, graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+2", 1, graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+3", 1, graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+4", 1, graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+5", 1, graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+6", 1, graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 2, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+7", 1, graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "C", 1, graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+1", 1, graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+2", 1, graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+3", 1, graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+4", 1, graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+5", 1, graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+6", 1, graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+7", 1, graph_8);
 
 	disableVSPIScreens();
 
@@ -3288,8 +3284,8 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 
 	if (pressureHr1 > 1020) {
 
-		loVal = 1000;
-		hiVal = 1100;
+		loVal = 980;
+		hiVal = 1060;
 	}
 
 	else if (pressureHr1 > 960 && pressureHr1 < 1020) {

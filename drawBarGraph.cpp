@@ -9,6 +9,29 @@
 
 /*-----------------------------------------------------------------*/
 
+/*
+  This method will draw a vertical bar graph for single input
+  it has a rather large arguement list and is as follows
+  &d = display object name
+  x = position of bar graph (lower left of bar)
+  y = position of bar (lower left of bar
+  w = width of bar graph
+  h =  height of bar graph (does not need to be the same as the max scale)
+  loval = lower value of the scale (can be negative)
+  hival = upper value of the scale
+  inc = scale division between loval and hival
+  curval = date to graph (must be between loval and hival)
+  dig = format control to set number of digits to display (not includeing the decimal)
+  dec = format control to set number of decimals to display (not includeing the decimal)
+  barcolor = color of bar graph
+  voidcolor = color of bar graph background
+  bordercolor = color of the border of the graph
+  textcolor = color of the text
+  backcolor = color of the bar graph's background
+  label = bottom lable text for the graph
+  redraw = flag to redraw display only on first pass (to reduce flickering)
+*/
+
 void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, double w, double h, double loval, double hival, double inc, int curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean fillBar, boolean& redraw)
 {
 
@@ -49,7 +72,7 @@ void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
     tft.fillRect(x, y - h, w, h - level, voidcolor);
     tft.drawFastHLine(x, y + 1 - level, w, barcolor);
     tft.drawFastHLine(x, y + 1 - level - 1, w, barcolor);
-    tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
+    //tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
     
     if (fillBar == 1) {
 
@@ -57,6 +80,8 @@ void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
     }
     
     else {}
+
+    tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
 
     // write the current value
     /*
@@ -109,7 +134,7 @@ void drawBarChartV2(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
     tft.fillRect(x, y - h, w, h - level, voidcolor);
     tft.drawFastHLine(x, y + 1 - level, w, barcolor);
     tft.drawFastHLine(x, y + 1 - level - 1, w, barcolor);
-    tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
+    //tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
 
     if (fillBar == 1) {
 
@@ -117,6 +142,8 @@ void drawBarChartV2(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
     }
 
     else {}
+
+    tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
 
     // write the current value
     /*
