@@ -18,7 +18,6 @@
 #include <ArduinoJSON.h>
 #include <Adafruit_MCP23X08.h>		// Additional I/O port expander
 #include <SimpleBME280.h>			// Internal environment sensor
-#include <XPT2046_Touchscreen.h>	// Touch screen control
 
 #include <Fonts/FreeSans9pt7b.h>	
 #include <Fonts/FreeSans12pt7b.h>
@@ -3095,7 +3094,7 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 		increments = 1;
 	}
 
-	else if (rainChartScale <= 250) {
+	else if (rainChartScale <= 25) {
 
 		hiVal = 25;
 		increments = 5;
