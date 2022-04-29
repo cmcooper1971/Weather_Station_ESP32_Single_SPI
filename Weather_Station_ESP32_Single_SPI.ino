@@ -1435,6 +1435,8 @@ void loop() {
 
 		intervalTGetData = millis();
 
+
+
 	}
 
 	if (millis() >= intervalTTempRotate + intervalPTemp) {
@@ -1667,53 +1669,16 @@ void getWeatherData() {
 	rainFallHr7 = (myObject["hourly"][7]["rain"]["1h"]);
 	rainFallHr8 = (myObject["hourly"][8]["rain"]["1h"]);
 
-	// Set hourly chart scale.
+	// Test Data
 
-	if (rainFallHr1 > rainChartScale) {
-
-		rainChartScale = rainFallHr1;
-	}
-
-	if (rainFallHr2 > rainChartScale) {
-
-		rainChartScale = rainFallHr2;
-	}
-
-
-	if (rainFallHr3 > rainChartScale) {
-
-		rainChartScale = rainFallHr3;
-	}
-
-
-	if (rainFallHr4 > rainChartScale) {
-
-		rainChartScale = rainFallHr4;
-	}
-
-
-	if (rainFallHr5 > rainChartScale) {
-
-		rainChartScale = rainFallHr5;
-	}
-
-
-	if (rainFallHr6 > rainChartScale) {
-
-		rainChartScale = rainFallHr6;
-	}
-
-
-	if (rainFallHr7 > rainChartScale) {
-
-		rainChartScale = rainFallHr7;
-	}
-
-
-	if (rainFallHr8 > rainChartScale) {
-
-		rainChartScale = rainFallHr8;
-	}
+	/*rainFallHr1 = 24.67;
+	rainFallHr2 = 10.15;
+	rainFallHr3 = 11.40;
+	rainFallHr4 = 12.20;
+	rainFallHr5 = 16.90;
+	rainFallHr6 = 13.00;
+	rainFallHr7 = 14.10;
+	rainFallHr8 = 13.20;*/
 
 	pressureHr1 = (myObject["hourly"][1]["pressure"]);
 	pressureHr2 = (myObject["hourly"][2]["pressure"]);
@@ -3073,6 +3038,54 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 	tft.setFont();
 
 	tft.setTextSize(0);
+
+	// Set hourly chart scale.
+
+	if (rainFallHr1 > rainChartScale) {
+
+		rainChartScale = rainFallHr1;
+	}
+
+	if (rainFallHr2 > rainChartScale) {
+
+		rainChartScale = rainFallHr2;
+	}
+
+
+	if (rainFallHr3 > rainChartScale) {
+
+		rainChartScale = rainFallHr3;
+	}
+
+
+	if (rainFallHr4 > rainChartScale) {
+
+		rainChartScale = rainFallHr4;
+	}
+
+
+	if (rainFallHr5 > rainChartScale) {
+
+		rainChartScale = rainFallHr5;
+	}
+
+
+	if (rainFallHr6 > rainChartScale) {
+
+		rainChartScale = rainFallHr6;
+	}
+
+
+	if (rainFallHr7 > rainChartScale) {
+
+		rainChartScale = rainFallHr7;
+	}
+
+
+	if (rainFallHr8 > rainChartScale) {
+
+		rainChartScale = rainFallHr8;
+	}
 
 	// Convert Double to Int
 
