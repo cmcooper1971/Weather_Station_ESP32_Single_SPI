@@ -190,7 +190,7 @@ const long debounceDelayMI = 200;			// Debounce delay timing for metric imperial
 // Timer variables (check Open Weather).
 
 unsigned long intervalTGetData = 0;
-const unsigned long intervalPGetData = 180000;			// Reset to 300,000 when finished with design (5 minutes sleep time)
+const unsigned long intervalPGetData = 900000;			// Reset to 300,000 when finished with design (5 minutes sleep time)
 
 // Timer variables (check wifi).
 
@@ -1433,9 +1433,69 @@ void loop() {
 
 		getWeatherData();
 
+		// Update displays.
+
+		currentWeatherLayout();
+		currentWeatherTemp();
+		currentWeatherDataDisplay(moonPhaseNow);
+
+		forecastWeatherLayoutDayX(tft, 2);
+		forecastDataDisplayTempDayX(tft, 2, forecastTimeFc1, weatherDesFc1, tempDayFc1, tempNightFc1, tempMinFc1, tempMaxFc1, windSpeedFc1);
+		forecastDataDisplayDayX(tft, 2, forecastTimeFc1, pressureFc1, humidityFc1, windSpeedFc1, windDirectionFc1, uvIndexFc1, weatherLabelFc1, rainLevelFc1, sunRiseFc1, sunSetFc1, moonPhaseFc1);
+
+		forecastWeatherLayoutDayX(tft, 3);
+		forecastDataDisplayTempDayX(tft, 3, forecastTimeFc2, weatherDesFc2, tempDayFc2, tempNightFc2, tempMinFc2, tempMaxFc2, windSpeedFc2);
+		forecastDataDisplayDayX(tft, 3, forecastTimeFc2, pressureFc2, humidityFc2, windSpeedFc2, windDirectionFc2, uvIndexFc2, weatherLabelFc2, rainLevelFc2, sunRiseFc2, sunSetFc2, moonPhaseFc2);
+
+		forecastWeatherLayoutDayX(tft, 4);
+		forecastDataDisplayTempDayX(tft, 4, forecastTimeFc3, weatherDesFc3, tempDayFc3, tempNightFc3, tempMinFc3, tempMaxFc3, windSpeedFc3);
+		forecastDataDisplayDayX(tft, 4, forecastTimeFc3, pressureFc3, humidityFc3, windSpeedFc3, windDirectionFc3, uvIndexFc3, weatherLabelFc3, rainLevelFc3, sunRiseFc3, sunSetFc3, moonPhaseFc3);
+
+		if (dailyHourlyState == false) {
+
+			forecastWeatherLayoutDayX(tft, 5);
+			forecastDataDisplayTempDayX(tft, 5, forecastTimeFc4, weatherDesFc4, tempDayFc4, tempNightFc4, tempMinFc4, tempMaxFc4, windSpeedFc4);
+			forecastDataDisplayDayX(tft, 5, forecastTimeFc4, pressureFc4, humidityFc4, windSpeedFc4, windDirectionFc4, uvIndexFc4, weatherLabelFc4, rainLevelFc4, sunRiseFc4, sunSetFc4, moonPhaseFc4);
+
+			forecastWeatherLayoutDayX(tft, 6);
+			forecastDataDisplayTempDayX(tft, 6, forecastTimeFc5, weatherDesFc5, tempDayFc5, tempNightFc5, tempMinFc5, tempMaxFc5, windSpeedFc5);
+			forecastDataDisplayDayX(tft, 6, forecastTimeFc5, pressureFc5, humidityFc5, windSpeedFc5, windDirectionFc5, uvIndexFc5, weatherLabelFc5, rainLevelFc5, sunRiseFc5, sunSetFc5, moonPhaseFc5);
+
+			forecastWeatherLayoutDayX(tft, 7);
+			forecastDataDisplayTempDayX(tft, 7, forecastTimeFc6, weatherDesFc6, tempDayFc6, tempNightFc6, tempMinFc6, tempMaxFc6, windSpeedFc6);
+			forecastDataDisplayDayX(tft, 7, forecastTimeFc6, pressureFc6, humidityFc6, windSpeedFc6, windDirectionFc6, uvIndexFc6, weatherLabelFc6, rainLevelFc6, sunRiseFc6, sunSetFc6, moonPhaseFc6);
+
+			forecastWeatherLayoutDayX(tft, 8);
+			forecastDataDisplayTempDayX(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, windSpeedFc7);
+			forecastDataDisplayDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
+
+		}
+
+		else {
+
+			enableScreen5();
+			tft.fillScreen(WHITE);
+			drawHourlyTempChart(tft);
+			disableVSPIScreens();
+
+			enableScreen6();
+			tft.fillScreen(WHITE);
+			drawHourlyRainChart(tft);
+			disableVSPIScreens();
+
+			enableScreen7();
+			tft.fillScreen(WHITE);
+			drawHourlyPressureChart(tft);
+			disableVSPIScreens();
+
+			enableScreen8();
+			tft.fillScreen(WHITE);
+			drawCompassChart(tft);
+			disableVSPIScreens();
+
+		}
+
 		intervalTGetData = millis();
-
-
 
 	}
 
@@ -1571,7 +1631,7 @@ void loop() {
 		backLightToggled = false;
 
 	}
-		
+
 } // Close loop.
 
 /*-----------------------------------------------------------------*/
@@ -3548,33 +3608,33 @@ void controlBackLight() {
 
 	if (backLightState == true) {
 
-			mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
-			mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
-			mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
-			mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
-			delay(100);
-			mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
-			mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
+		mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
+		mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
+		delay(100);
+		mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
+		mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
+		delay(100);
+		mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
+		mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
+		delay(100);
+		mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
+		mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
 
 	}
 
 	else if (backLightState == false) {
 
-			mcp.digitalWrite(TFT_LED1_CTRL, LOW);
-			mcp.digitalWrite(TFT_LED5_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED2_CTRL, LOW);
-			mcp.digitalWrite(TFT_LED6_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED3_CTRL, LOW);
-			mcp.digitalWrite(TFT_LED7_CTRL, LOW);
-			delay(100);
-			mcp.digitalWrite(TFT_LED4_CTRL, LOW);
-			mcp.digitalWrite(TFT_LED8_CTRL, LOW);
+		mcp.digitalWrite(TFT_LED1_CTRL, LOW);
+		mcp.digitalWrite(TFT_LED5_CTRL, LOW);
+		delay(100);
+		mcp.digitalWrite(TFT_LED2_CTRL, LOW);
+		mcp.digitalWrite(TFT_LED6_CTRL, LOW);
+		delay(100);
+		mcp.digitalWrite(TFT_LED3_CTRL, LOW);
+		mcp.digitalWrite(TFT_LED7_CTRL, LOW);
+		delay(100);
+		mcp.digitalWrite(TFT_LED4_CTRL, LOW);
+		mcp.digitalWrite(TFT_LED8_CTRL, LOW);
 
 	}
 
