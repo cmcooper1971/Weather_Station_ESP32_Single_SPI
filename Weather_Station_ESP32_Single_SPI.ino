@@ -1670,10 +1670,6 @@ void getWeatherData() {
 	sunSetNow = (myObject["current"]["sunset"]);
 	moonPhaseNow = (myObject["daily"][0]["moon_phase"]);
 
-	// Test data.
-
-	windDirectionNow = 200;
-
 	weatherDesCurrent.clear();
 	serializeJson((myObject["current"]["weather"][0]["description"]), weatherDesCurrent);
 	weatherDesCurrent.replace('"', ' ');
