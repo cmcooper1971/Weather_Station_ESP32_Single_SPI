@@ -22,15 +22,26 @@ int y = 130;
 
 // These are used to draw lines and the dial needle.
 
-double y_to = 0;
-double x_to = 0;
-int degree = 0;
 double calcSin = 0;
 double myPI = 3.14;
 
 // Array used to draw the tick marks around the dial.
 
 double tickMarks[12] = { 22.5, 45, 67.5, 112.5, 135, 157.5, 202.5, 225, 247.5, 292.5, 315, 337.5 };
+
+// Compass pointer.
+
+#define DEG2RAD 0.0174532925 
+
+float compassPivot_x = 70;
+float compassPivot_y = 90;
+float c_x1, c_x2, c_x3, c_x4;
+float c_y1, c_y2, c_y3, c_y4;
+float c_x1_old, c_x2_old, c_x3_old, c_x4_old;
+float c_y1_old, c_y2_old, c_y3_old, c_y4_old;
+
+float compassAngle;
+int   compass_r = 50;
 
 /*-----------------------------------------------------------------*/
 
@@ -158,63 +169,38 @@ void drawTicks(Adafruit_ILI9341& tft) {
 
 /*-----------------------------------------------------------------*/
 
-void drawNeedle(Adafruit_ILI9341& tft, double _degree) {
+void drawNeedle(Adafruit_ILI9341& tft, int degree) {
 
-	// Draw or erase needle.
+	// Remove old compass pointer.
+	
+	tft.fillTriangle(c_x1_old, c_y1_old, c_x2_old, c_y2_old, c_x4_old, c_y4_old, WHITE);          
+	tft.fillTriangle(c_x1_old, c_y1_old, c_x3_old, c_y3_old, c_x4_old, c_y4_old, WHITE);
 
-	// Erase the old needle.
+	// Set angle.
 
-	tft.drawLine(x + x_to, y + y_to, x, y, WHITE);
+	compassAngle = ((degree - 90) * DEG2RAD);
 
-	x_to = 0;
-	y_to = 0;
+	// Ccalculate coordinates
 
-	// I use our old friend from geometry, the pythagorean theorem, to draw the needle.
+	c_x1 = ((compassPivot_x + 40) + (compass_r * cos(compassAngle)));                       
+	c_y1 = ((compassPivot_y + 40) + (compass_r * sin(compassAngle)));
 
-	double x_t = 0;
-	double calcRad = _degree * myPI / 180;
+	c_x2 = ((compassPivot_x + 40) + (compass_r * cos(compassAngle + 170 * DEG2RAD)));
+	c_y2 = ((compassPivot_y + 40) + (compass_r * sin(compassAngle + 170 * DEG2RAD)));
 
-	// I set this up to use in place of multiple sin(calcRad) calls, but I
-	// left the sin(calcRad) in for now.
+	c_x3 = ((compassPivot_x + 40) + (compass_r * cos(compassAngle - 170 * DEG2RAD)));
+	c_y3 = ((compassPivot_y + 40) + (compass_r * sin(compassAngle - 170 * DEG2RAD)));
 
-	calcSin = sin(calcRad);
+	c_x4 = ((compassPivot_x + 40) + ((compass_r - 4) * cos(compassAngle - 180 * DEG2RAD)));
+	c_y4 = ((compassPivot_y + 40) + ((compass_r - 4) * sin(compassAngle - 180 * DEG2RAD)));
 
-	// Each quadrant around the circle has + or - values in relation to the center
-	// point (x, y).  The sin() function returns +/- values for x_to, but y_to has
-	// to be manipulated.
+	c_x1_old = c_x1; c_x2_old = c_x2; c_x3_old = c_x3;   c_x4_old = c_x4;
+	c_y1_old = c_y1; c_y2_old = c_y2; c_y3_old = c_y3;   c_y4_old = c_y4;
 
-	if (degree > -1 && degree < 91)
-	{
-		x_to = sin(calcRad) * DialRadius;
+	// New pointer.
 
-		// The x_t value was inserted for trouble shooting.  May be removed later.
-		// Shouldn't matter because (neg * neg) = positive number.
-
-		x_t = -1 * x_to;
-		y_to = -1 * sqrt((DialRadius * DialRadius) - (x_t * x_t));
-	}
-
-	if (degree > 90 && degree < 181)
-	{
-		x_to = sin(calcRad) * DialRadius;
-		y_to = (sqrt((DialRadius * DialRadius) - (x_to * x_to)));
-	}
-
-	if (degree > 180 && degree < 271)
-	{
-		x_to = sin(calcRad) * DialRadius;
-		y_to = (sqrt((DialRadius * DialRadius) - (x_to * x_to)));
-	}
-
-	if (degree > 270 && degree < 361)
-	{
-		x_to = sin(calcRad) * DialRadius;
-		x_t = -1 * x_to;
-		y_to = -1 * (sqrt((DialRadius * DialRadius) - (x_t * x_t)));
-	}
-
-	tft.drawLine(x + x_to, y + y_to, x, y, RED);
-	tft.fillCircle(x, y, 3, RED);
+	tft.fillTriangle(c_x1, c_y1, c_x3, c_y3, c_x4, c_y4, LTBLUE);                          
+	tft.fillTriangle(c_x1, c_y1, c_x2, c_y2, c_x4, c_y4, BLUE);
 
 } // Close function.
 

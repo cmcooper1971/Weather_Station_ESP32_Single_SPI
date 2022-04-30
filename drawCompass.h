@@ -11,7 +11,7 @@
 
 void drawCompass(Adafruit_ILI9341& tft);
 void drawTicks(Adafruit_ILI9341& tft);
-void drawNeedle(Adafruit_ILI9341& tft, double _degree);
+void drawNeedle(Adafruit_ILI9341& tft, int degree);
 
 #endif
 

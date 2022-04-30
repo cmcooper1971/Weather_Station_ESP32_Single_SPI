@@ -1670,6 +1670,10 @@ void getWeatherData() {
 	sunSetNow = (myObject["current"]["sunset"]);
 	moonPhaseNow = (myObject["daily"][0]["moon_phase"]);
 
+	// Test data.
+
+	windDirectionNow = 200;
+
 	weatherDesCurrent.clear();
 	serializeJson((myObject["current"]["weather"][0]["description"]), weatherDesCurrent);
 	weatherDesCurrent.replace('"', ' ');
@@ -2987,22 +2991,22 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 		tempTemp7 = temperatureHr7;
 		tempTemp8 = temperatureHr8;
 
-		if (tempTemp1 > 15) {
+		if (tempTemp1 > 18) {
 
 			loVal = 10;
-			hiVal = 45;
+			hiVal = 50;
 		}
 
-		else if (tempTemp1 > -10 && tempTemp1 <= 15) {
+		else if (tempTemp1 > -10 && tempTemp1 <= 18) {
 
 			loVal = -10;
-			hiVal = 25;
+			hiVal = 30;
 		}
 
 		else if (tempTemp1 < -10) {
 
 			loVal = -30;
-			hiVal = 5;
+			hiVal = 10;
 		}
 
 	}
