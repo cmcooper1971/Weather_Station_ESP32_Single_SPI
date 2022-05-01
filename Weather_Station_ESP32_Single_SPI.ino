@@ -42,6 +42,8 @@
 #include "iconsThunderstorms.h"		// Weather bitmaps
 #include "iconsMoonPhase.h"			// Weather bitmaps
 
+#define debug = false;
+
 // TFT SPI Interface for ESP32.
 
 #define VSPI_MISO   19 // MISO - Not needed for display(s)
