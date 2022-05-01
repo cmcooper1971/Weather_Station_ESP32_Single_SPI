@@ -244,7 +244,7 @@ double feelsLikeTempNow;
 unsigned int pressureNow;
 double humidityNow;
 double windSpeedNow;
-unsigned int windDirectionNow;
+int windDirectionNow;
 byte uvIndexNow;
 unsigned int currentWeatherNow;
 String weatherDesCurrent;
@@ -1927,6 +1927,7 @@ void getWeatherData() {
 	weatherDesFc7[0] = toupper(weatherDesFc7[0]);
 
 	Serial.print(F("Json Variable Moon Phase    : "));
+	Serial.println(moonPhaseNow);
 	Serial.println(moonPhaseFc1);
 	Serial.println(moonPhaseFc2);
 	Serial.println(moonPhaseFc3);
@@ -2210,7 +2211,7 @@ void currentWeatherDataDisplay(double moonPhaseFc) {
 
 	tft.setFont();
 	tft.setTextSize(0);
-	tft.setTextColor(BLACK);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(11, 215);
 	tft.printf("%s\n", buf);
 
@@ -2227,7 +2228,7 @@ void currentWeatherDataDisplay(double moonPhaseFc) {
 
 	tft.setFont();
 	tft.setTextSize(0);
-	tft.setTextColor(BLACK);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(61, 215);
 	tft.printf("%s\n", buf);
 
@@ -2570,7 +2571,7 @@ void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 
 	tft.setFont();
 	tft.setTextSize(0);
-	tft.setTextColor(BLACK);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(11, 215);
 	tft.printf("%s\n", buf);
 
@@ -2587,7 +2588,7 @@ void forecastDataDisplayDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 
 	tft.setFont();
 	tft.setTextSize(0);
-	tft.setTextColor(BLACK);
+	tft.setTextColor(BLACK, WHITE);
 	tft.setCursor(61, 215);
 	tft.printf("%s\n", buf);
 
@@ -3400,7 +3401,11 @@ void drawCompassChart(Adafruit_ILI9341& tft) {
 	tft.print("Wind Direction");
 	tft.setFont();
 
+	// Draw weathervain.
+
 	drawBitmap(tft, 40, 228, weatherVainLrgBlk, 64, 64);
+
+	// Display wind direction degrees, aligning text.
 
 	if (windDirectionNow > 99) {
 
@@ -3437,6 +3442,18 @@ void drawCompassChart(Adafruit_ILI9341& tft) {
 
 	drawCompass(tft);
 	drawNeedle(tft, windDirectionNow);
+
+	// Clear previous heading text.
+
+	tft.fillRect(242, 162, 47, 30, WHITE);
+
+	// Display heading text.
+
+	heading = getHeadingReturn(windDirectionNow);
+	tft.setFont(&FreeSans12pt7b);
+	tft.setTextSize(1);
+	tft.setCursor(245, 185);
+	tft.print(headingArray[heading]);
 
 } // Close function.
 
