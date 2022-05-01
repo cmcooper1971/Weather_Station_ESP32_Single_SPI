@@ -2436,7 +2436,10 @@ void dataDisplayCurrentWeatherAlternateData() {
 
 		rainPopTemp = rainPopNow * 100;
 
+		drawBitmap(tft, RAINSNOWICON_Y, RAINSNOWICON_X, precipitation, RAINSNOWICON_W, RAINSNOWICON_H);
+
 		tft.fillRect(RAINSNOWVALUE_X, RAINSNOWVALUE_Y - 15, 45, 30, WHITE);
+
 		tft.setFont(&FreeSans9pt7b);
 		tft.setTextSize(1);
 		tft.setCursor(RAINSNOWVALUE_X, RAINSNOWVALUE_Y);
@@ -3007,6 +3010,8 @@ void dataDisplayForecastAlternateData(Adafruit_ILI9341& tft, byte screen, unsign
 		byte rainPopTemp;
 
 		rainPopTemp = rainPopFc * 100;
+
+		drawBitmap(tft, RAINSNOWICON_Y, RAINSNOWICON_X, precipitation, RAINSNOWICON_W, RAINSNOWICON_H);
 
 		tft.fillRect(RAINSNOWVALUE_X, RAINSNOWVALUE_Y - 15, 45, 30, WHITE);
 
