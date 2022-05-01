@@ -17,7 +17,6 @@
 #include <SPIFFS.h>
 #include <ArduinoJSON.h>
 #include <Adafruit_MCP23X08.h>		// Additional I/O port expander
-#include <SimpleBME280.h>			// Internal environment sensor
 
 #include <Fonts/FreeSans9pt7b.h>	
 #include <Fonts/FreeSans12pt7b.h>
@@ -99,11 +98,6 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(VSPI_CS0, VSPI_DC, VSPI_RST); // CS0 is 
 // MCP23008.
 
 Adafruit_MCP23X08 mcp;
-
-// BME280 Sensor.
-
-SimpleBME280 bme280;
-float t, p, h;
 
 // Configure time settings.
 
@@ -210,13 +204,17 @@ boolean flagTempDisplayChange = false;
 unsigned long intervalTTempRotate = 0;
 const unsigned long intervalPTemp = 5000;
 
+// Time variables (sleep screens)
+
+unsigned long sleepScreenTime;
+const unsigned long sleepScreensP = 600000;
+
 // Touch variables.
 
 const int touchThreshold = 20;
 int touchValueBackLight = 25;
 int touchValueDailyHourly = 25;
 int touchValueMetrixImperial = 25;
-
 
 // Weather variables.
 
@@ -793,13 +791,6 @@ void setup() {
 
 	mcp.begin_I2C();
 
-	// Enable BME sensor.
-
-	Serial.println(F("BME280 start"));
-	Serial.println(F(""));
-
-	bme280.begin();
-
 	// Set pin modes.
 
 	pinMode(VSPI_CS1, OUTPUT); //VSPI CS
@@ -1348,6 +1339,8 @@ void setup() {
 	dataDisplayForecastAlternateData(tft, 8, forecastTimeFc7, weatherDesFc7, tempDayFc7, tempNightFc7, tempMinFc7, tempMaxFc7, rainLevelFc7, rainPopFc7, windSpeedFc7, snowLevelFc7);
 	dataDisplayForecastDayX(tft, 8, forecastTimeFc7, pressureFc7, humidityFc7, windSpeedFc7, windDirectionFc7, uvIndexFc7, weatherLabelFc7, rainLevelFc7, snowLevelFc7, sunRiseFc7, sunSetFc7, moonPhaseFc7);
 
+	sleepScreenTime = millis() + sleepScreensP;
+
 } // Close setup.
 
 /*-----------------------------------------------------------------*/
@@ -1377,6 +1370,8 @@ void loop() {
 				backLightToggled = true;
 				lastDebounceTimeBkL = millis();
 			}
+
+			sleepScreenTime = millis();
 		}
 	}
 
@@ -1401,6 +1396,8 @@ void loop() {
 				dailyHourlyToggled = true;
 				lastDebounceTimeDH = millis();
 			}
+
+			sleepScreenTime = millis();
 		}
 	}
 
@@ -1425,6 +1422,8 @@ void loop() {
 				metricImperialToggled = true;
 				lastDebounceTimeMI = millis();
 			}
+
+			sleepScreenTime = millis();
 		}
 
 	}
@@ -1640,6 +1639,15 @@ void loop() {
 
 	}
 
+	// Turn off displays after sleep period is reached.
+
+	if (millis() >= sleepScreenTime + sleepScreensP) {
+
+		backLightState = false;
+		controlBackLight();
+
+	}
+
 } // Close loop.
 
 /*-----------------------------------------------------------------*/
@@ -1820,7 +1828,7 @@ void getWeatherData() {
 	sunRiseFc3 = (myObject["daily"][3]["sunrise"]);
 	sunSetFc3 = (myObject["daily"][3]["sunset"]);
 	moonPhaseFc3 = (myObject["daily"][3]["moon_phase"]);
-	
+
 	weatherDesFc3.clear();
 	serializeJson((myObject["daily"][3]["weather"][0]["description"]), weatherDesFc3);
 	weatherDesFc3.replace('"', ' ');
@@ -2333,16 +2341,6 @@ void dataDisplayCurrentWeatherAlternateData() {
 			tft.print("mm");
 
 		}
-
-		//bme280.update();
-		//t = bme280.getT();
-		//h = bme280.getH();
-		//tft.setCursor(150, 20);			// Remove later
-		//tft.print("T: ");				// Remove later
-		//tft.print(t);					// Remove later
-		//tft.print(" H: ");				// Remove later
-		//tft.print(h);					// Remove later
-		//tft.setFont();					// Remove later
 
 	}
 
@@ -3846,6 +3844,8 @@ void controlBackLight() {
 		delay(100);
 		mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
 		mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
+
+		sleepScreenTime = millis();
 
 	}
 

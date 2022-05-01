@@ -27,8 +27,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wire", "Libraries\Wire\Wire
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_MCP23017_Arduino_Library", "Libraries\Adafruit_MCP23017_Arduino_Library\Adafruit_MCP23017_Arduino_Library.vcxitems", "{A6F510E7-6328-45D1-837D-54AE8224F30F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleBME280", "Libraries\SimpleBME280\SimpleBME280.vcxitems", "{8E931BD0-FB4F-4240-9828-58C4BFEEE434}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{0ea0e7ee-91d1-4809-88ef-c98277904eba}*SharedItemsImports = 9
@@ -38,7 +36,6 @@ Global
 		Libraries\SPIFFS\SPIFFS.vcxitems*{729f0289-2faf-4241-a909-364a74250827}*SharedItemsImports = 9
 		Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems*{833ccc45-1d00-4f21-98fb-52202fa56fe0}*SharedItemsImports = 9
 		Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{881a77b1-a659-403d-90bd-8c62ac465dda}*SharedItemsImports = 9
-		Libraries\SimpleBME280\SimpleBME280.vcxitems*{8e931bd0-fb4f-4240-9828-58c4bfeee434}*SharedItemsImports = 9
 		Libraries\HTTPClient\HTTPClient.vcxitems*{96cb0237-19d5-4ff6-b6b1-8a95fd4a7c42}*SharedItemsImports = 9
 		Libraries\Adafruit_MCP23017_Arduino_Library\Adafruit_MCP23017_Arduino_Library.vcxitems*{a6f510e7-6328-45d1-837d-54ae8224f30f}*SharedItemsImports = 9
 		Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems*{aeb7c2c1-0259-43a9-929f-6266d05d5bd3}*SharedItemsImports = 9
@@ -49,7 +46,6 @@ Global
 		Libraries\ESP32Time\ESP32Time.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\HTTPClient\HTTPClient.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\SimpleBME280\SimpleBME280.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPIFFS\SPIFFS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\WiFi\WiFi.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
