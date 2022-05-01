@@ -3450,10 +3450,24 @@ void drawCompassChart(Adafruit_ILI9341& tft) {
 	// Display heading text.
 
 	heading = getHeadingReturn(windDirectionNow);
+	
+	if (heading == 1 || heading == 3 || heading == 5 || heading == 7 ) {
+		
 	tft.setFont(&FreeSans12pt7b);
 	tft.setTextSize(1);
 	tft.setCursor(245, 185);
 	tft.print(headingArray[heading]);
+
+	}
+
+	else {
+
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextSize(1);
+		tft.setCursor(255, 185);
+		tft.print(headingArray[heading]);
+
+	}
 
 } // Close function.
 
