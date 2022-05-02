@@ -234,7 +234,7 @@ char headingArray[8][3] = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
 
 // Wind speed description array.
 
-char windSpeedDescription[14][18] = { ", calm", ", light air", ", light breeze", ", gentle breeze", ", moderate breeze", ", freesh breeze", ", strong breeze", ", near gale", ", gale", ", sever gale", ", storm", ", violent storm", ", hurricane" };
+char windSpeedDescription[14][17] = { " calm", " light air", " light breeze", " gentle breeze", " moderate breeze", " freesh breeze", " strong breeze", " near gale", " gale", " sever gale", " storm", " violent storm", " hurricane" };
 
 // Current weather variables.
 
@@ -1691,7 +1691,7 @@ void getWeatherData() {
 
 	weatherDesCurrent.clear();
 	serializeJson((myObject["current"]["weather"][0]["description"]), weatherDesCurrent);
-	weatherDesCurrent.replace('"', ' ');
+	weatherDesCurrent.replace('"', ',');
 	weatherDesCurrent.remove(0, 1);
 	weatherDesCurrent[0] = toupper(weatherDesCurrent[0]);
 
@@ -1781,7 +1781,7 @@ void getWeatherData() {
 
 	weatherDesFc1.clear();
 	serializeJson((myObject["daily"][1]["weather"][0]["description"]), weatherDesFc1);
-	weatherDesFc1.replace('"', ' ');
+	weatherDesFc1.replace('"', ',');
 	weatherDesFc1.remove(0, 1);
 	weatherDesFc1[0] = toupper(weatherDesFc1[0]);
 
@@ -1807,7 +1807,7 @@ void getWeatherData() {
 
 	weatherDesFc2.clear();
 	serializeJson((myObject["daily"][2]["weather"][0]["description"]), weatherDesFc2);
-	weatherDesFc2.replace('"', ' ');
+	weatherDesFc2.replace('"', ',');
 	weatherDesFc2.remove(0, 1);
 	weatherDesFc2[0] = toupper(weatherDesFc2[0]);
 
@@ -1833,7 +1833,7 @@ void getWeatherData() {
 
 	weatherDesFc3.clear();
 	serializeJson((myObject["daily"][3]["weather"][0]["description"]), weatherDesFc3);
-	weatherDesFc3.replace('"', ' ');
+	weatherDesFc3.replace('"', ',');
 	weatherDesFc3.remove(0, 1);
 	weatherDesFc3[0] = toupper(weatherDesFc3[0]);
 
@@ -1859,7 +1859,7 @@ void getWeatherData() {
 
 	weatherDesFc4.clear();
 	serializeJson((myObject["daily"][4]["weather"][0]["description"]), weatherDesFc4);
-	weatherDesFc4.replace('"', ' ');
+	weatherDesFc4.replace('"', ',');
 	weatherDesFc4.remove(0, 1);
 	weatherDesFc4[0] = toupper(weatherDesFc4[0]);
 
@@ -1885,7 +1885,7 @@ void getWeatherData() {
 
 	weatherDesFc5.clear();
 	serializeJson((myObject["daily"][5]["weather"][0]["description"]), weatherDesFc5);
-	weatherDesFc5.replace('"', ' ');
+	weatherDesFc5.replace('"', ',');
 	weatherDesFc5.remove(0, 1);
 	weatherDesFc5[0] = toupper(weatherDesFc5[0]);
 
@@ -1911,7 +1911,7 @@ void getWeatherData() {
 
 	weatherDesFc6.clear();
 	serializeJson((myObject["daily"][6]["weather"][0]["description"]), weatherDesFc6);
-	weatherDesFc6.replace('"', ' ');
+	weatherDesFc6.replace('"', ',');
 	weatherDesFc6.remove(0, 1);
 	weatherDesFc6[0] = toupper(weatherDesFc6[0]);
 
@@ -1937,7 +1937,7 @@ void getWeatherData() {
 
 	weatherDesFc7.clear();
 	serializeJson((myObject["daily"][7]["weather"][0]["description"]), weatherDesFc7);
-	weatherDesFc7.replace('"', ' ');
+	weatherDesFc7.replace('"', ',');
 	weatherDesFc7.remove(0, 1);
 	weatherDesFc7[0] = toupper(weatherDesFc7[0]);
 
@@ -3636,13 +3636,15 @@ void drawCompassChart(Adafruit_ILI9341& tft) {
 
 	// Align and display heading text.
 
+	// Array { "N", "NE", "E", "SE", "S", "SW", "W", "NW" }
+
 	heading = getHeadingReturn(windDirectionNow);
 
 	if (heading == 1 || heading == 3 || heading == 5 || heading == 7) {
 
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextSize(1);
-		tft.setCursor(245, 185);
+		tft.setCursor(248, 185);
 		tft.print(headingArray[heading]);
 
 	}
@@ -3652,6 +3654,15 @@ void drawCompassChart(Adafruit_ILI9341& tft) {
 		tft.setFont(&FreeSans12pt7b);
 		tft.setTextSize(1);
 		tft.setCursor(253, 185);
+		tft.print(headingArray[heading]);
+
+	}
+
+	else if (heading == 0) {
+
+		tft.setFont(&FreeSans12pt7b);
+		tft.setTextSize(1);
+		tft.setCursor(255, 185);
 		tft.print(headingArray[heading]);
 
 	}
