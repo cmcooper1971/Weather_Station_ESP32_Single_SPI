@@ -137,6 +137,7 @@
     <ClInclude Include="drawCompass.h" />
     <ClInclude Include="forecastWeatherImage.h" />
     <ClInclude Include="getHeading.h" />
+    <ClInclude Include="iconsStart.h" />
     <ClInclude Include="iconsMoonPhase.h" />
     <ClInclude Include="icons.h" />
     <ClInclude Include="iconsAtmosphere.h" />

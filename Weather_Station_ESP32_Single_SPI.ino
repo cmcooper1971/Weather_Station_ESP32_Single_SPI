@@ -32,6 +32,7 @@
 
 #include "colours.h"                // Colours
 #include "screenLayout.h"			// Screen layout
+#include "iconsStart.h"				// Start up bitmaps
 #include "icons.h"					// Weather bitmaps
 #include "iconsAtmosphere.h"		// Weather bitmaps
 #include "iconsClear.h"				// Weather bitmaps
@@ -41,8 +42,6 @@
 #include "iconsSnow.h"				// Weather bitmaps
 #include "iconsThunderstorms.h"		// Weather bitmaps
 #include "iconsMoonPhase.h"			// Weather bitmaps
-
-#define debug = false;
 
 // TFT SPI Interface for ESP32.
 
@@ -125,31 +124,35 @@ boolean apMode = false;
 
 const char* PARAM_INPUT_1 = "ssid";
 const char* PARAM_INPUT_2 = "pass";
-const char* PARAM_INPUT_3 = "ip";
-const char* PARAM_INPUT_4 = "subnet";
-const char* PARAM_INPUT_5 = "gateway";
-const char* PARAM_INPUT_6 = "dns";
-const char* PARAM_INPUT_7 = "openwk";
+//const char* PARAM_INPUT_3 = "ip";
+//const char* PARAM_INPUT_4 = "subnet";
+//const char* PARAM_INPUT_5 = "gateway";
+//const char* PARAM_INPUT_6 = "dns";
+const char* PARAM_INPUT_3 = "openwk";
+const char* PARAM_INPUT_4 = "latitude";
+const char* PARAM_INPUT_5 = "longitude";
 
 // Variables to save values from HTML form.
 
 String ssid;
 String pass;
-String ip;
-String subnet;
-String gateway;
-String dns;
+//String ip;
+//String subnet;
+//String gateway;
+//String dns;
 String openwk;
 
 // File paths to save input values permanently.
 
 const char* ssidPath = "/ssid.txt";
 const char* passPath = "/pass.txt";
-const char* ipPath = "/ip.txt";
-const char* subnetPath = "/subnet.txt";
-const char* gatewayPath = "/gateway.txt";
-const char* dnsPath = "/dns.txt";
+//const char* ipPath = "/ip.txt";
+//const char* subnetPath = "/subnet.txt";
+//const char* gatewayPath = "/gateway.txt";
+//const char* dnsPath = "/dns.txt";
 const char* openWKPath = "/openwk.txt";
+const char* latitudePath = "/latitude.txt";
+const char* longitudePath = "/longitude.txt";
 
 // Network variables.
 
@@ -169,10 +172,10 @@ DynamicJsonDocument weatherData(35788); //35788
 
 // Replace with your country code and city.
 
-String city = "Norwich";
-String countryCode = "GB";
-String latitude = "52.628101";
-String longitude = "1.299350";
+//String city = "Norwich";
+//String countryCode = "GB";
+String latitude;	// "52.628101";
+String longitude;	// "1.299350";
 
 // Timer debounce
 
@@ -477,7 +480,7 @@ bool initWiFi() {
 	//}
 
 	if (ssid == "" || pass == "" || openwk == "") {
-		Serial.println("Undefined SSID, Password or Open Weather Key.");
+		//Serial.println("Undefined SSID, Password or Open Weather Key.");
 		return false;
 	}
 
@@ -493,7 +496,7 @@ bool initWiFi() {
 	}
 
 	WiFi.begin(ssid.c_str(), pass.c_str());
-	Serial.println("Connecting to WiFi...");
+	//Serial.println("Connecting to WiFi...");
 
 	// If ESP32 inits successfully in station mode, recolour WiFi to amber.
 
@@ -740,7 +743,7 @@ void printLocalTime() {
 
 	if (!getLocalTime(&timeinfo)) {
 
-		Serial.println("Failed, time set to default.");
+		//Serial.println("Failed, time set to default.");
 
 		// Set time manually.
 
@@ -759,9 +762,9 @@ void printLocalTime() {
 		return;
 	}
 
-	Serial.println("");
-	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M %Z");
-	Serial.println("");
+	//Serial.println("");
+	//Serial.println(&timeinfo, "%A, %B %d %Y %H:%M %Z");
+	//Serial.println("");
 
 	// Text block to over write characters from longer dates when date changes and unit has been running.
 
@@ -818,11 +821,11 @@ void setup() {
 	touchValueDailyHourly = touchRead(espTouchDailyHourly);
 	touchValueMetrixImperial = touchRead(espTouchMetricImperial);
 
-	Serial.println("Touch Values:");
-	Serial.println(touchValueBackLight);
-	Serial.println(touchValueDailyHourly);
-	Serial.println(touchValueMetrixImperial);
-	Serial.println("");
+	//Serial.println("Touch Values:");
+	//Serial.println(touchValueBackLight);
+	//Serial.println(touchValueDailyHourly);
+	//Serial.println(touchValueMetrixImperial);
+	//Serial.println("");
 
 	// Reset MCP23008 port driver.
 
@@ -958,34 +961,34 @@ void setup() {
 	disableVSPIScreens();
 
 	enableScreen2();
-	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, fswindsock, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen3();
-	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, fsatmospheric, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen4();
-	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, fshumidity, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen5();
-	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, fsrainfall, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen6();
-	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, fstemperature, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen7();
-	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, fsuv, 128, 128);
 	disableVSPIScreens();
 
 	enableScreen8();
-	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+	drawBitmap(tft, 48, 96, fsweathervain, 128, 128);
 	disableVSPIScreens();
 
-	delay(2000);
+	delay(4000);
 
 	// Clear screens.
 
@@ -1065,24 +1068,28 @@ void setup() {
 	//writeFile(SPIFFS, dnsPath, dns.c_str());
 	//writeFile(SPIFFS, openWKPath, openwk.c_str());
 
-	Serial.println();
+	//Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
 	pass = readFile(SPIFFS, passPath);
-	ip = readFile(SPIFFS, ipPath);
-	subnet = readFile(SPIFFS, subnetPath);
-	gateway = readFile(SPIFFS, gatewayPath);
-	dns = readFile(SPIFFS, dnsPath);
+	//ip = readFile(SPIFFS, ipPath);
+	//subnet = readFile(SPIFFS, subnetPath);
+	//gateway = readFile(SPIFFS, gatewayPath);
+	//dns = readFile(SPIFFS, dnsPath);
 	openwk = readFile(SPIFFS, openWKPath);
+	latitude = readFile(SPIFFS, latitudePath);
+	longitude = readFile(SPIFFS, longitudePath);
 
-	Serial.println();
-	Serial.println(ssid);
-	Serial.println(pass);
-	Serial.println(ip);
-	Serial.println(subnet);
-	Serial.println(gateway);
-	Serial.println(dns);
-	Serial.println(openwk);
-	Serial.println();
+	//Serial.println();
+	//Serial.println(ssid);
+	//Serial.println(pass);
+	//Serial.println(ip);
+	//Serial.println(subnet);
+	//Serial.println(gateway);
+	//Serial.println(dns);
+	//Serial.println(openwk);
+	//Serial.println(latitude);
+	//Serial.println(longitude);
+	//Serial.println();
 
 	if (initWiFi()) {
 
@@ -1107,7 +1114,7 @@ void setup() {
 		events.onConnect([](AsyncEventSourceClient* client) {
 
 			if (client->lastId()) {
-				Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+				//Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
 			}
 			});
 
@@ -1134,15 +1141,15 @@ void setup() {
 		disableVSPIScreens();
 
 		// Set Access Point.
-		Serial.println("Setting AP (Access Point)");
+		//Serial.println("Setting AP (Access Point)");
 
 		// NULL sets an open Access Point.
 
 		WiFi.softAP("WIFI-MANAGER", NULL);
 
 		IPAddress IP = WiFi.softAPIP();
-		Serial.print("AP IP address: ");
-		Serial.println(IP);
+		//Serial.print("AP IP address: ");
+		//Serial.println(IP);
 
 		// Web Server Root URL For WiFi Manager Web Page.
 
@@ -1167,7 +1174,7 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, ssidPath, ssid.c_str());
 					}
-					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 
 					// HTTP POST pass value
 					if (p->name() == PARAM_INPUT_2) {
@@ -1177,61 +1184,80 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, passPath, pass.c_str());
 					}
-					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
+					// HTTP POST ip value
+					//if (p->name() == PARAM_INPUT_3) {
+					//	ip = p->value().c_str();
+					//	Serial.print("IP Address set to: ");
+					//	Serial.println(ip);
+					//	// Write file to save value
+					//	writeFile(SPIFFS, ipPath, ip.c_str());
+					//}
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
+					// HTTP POST ip value
+					//if (p->name() == PARAM_INPUT_4) {
+					//	subnet = p->value().c_str();
+					//	Serial.print("Subnet Address: ");
+					//	Serial.println(subnet);
+					//	// Write file to save value
+					//	writeFile(SPIFFS, subnetPath, subnet.c_str());
+					//}
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
+					// HTTP POST ip value
+					//if (p->name() == PARAM_INPUT_5) {
+					//	gateway = p->value().c_str();
+					//	Serial.print("Gateway set to: ");
+					//	Serial.println(gateway);
+					//	// Write file to save value
+					//	writeFile(SPIFFS, gatewayPath, gateway.c_str());
+					//}
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
+					// HTTP POST ip value
+					//if (p->name() == PARAM_INPUT_6) {
+					//	dns = p->value().c_str();
+					//	Serial.print("DNS Address set to: ");
+					//	Serial.println(dns);
+					//	// Write file to save value
+					//	writeFile(SPIFFS, dnsPath, dns.c_str());
+					//}
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 
 					// HTTP POST ip value
 					if (p->name() == PARAM_INPUT_3) {
-						ip = p->value().c_str();
-						Serial.print("IP Address set to: ");
-						Serial.println(ip);
-						// Write file to save value
-						writeFile(SPIFFS, ipPath, ip.c_str());
-					}
-					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					if (p->name() == PARAM_INPUT_4) {
-						subnet = p->value().c_str();
-						Serial.print("Subnet Address: ");
-						Serial.println(subnet);
-						// Write file to save value
-						writeFile(SPIFFS, subnetPath, subnet.c_str());
-					}
-					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					if (p->name() == PARAM_INPUT_5) {
-						gateway = p->value().c_str();
-						Serial.print("Gateway set to: ");
-						Serial.println(gateway);
-						// Write file to save value
-						writeFile(SPIFFS, gatewayPath, gateway.c_str());
-					}
-					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					if (p->name() == PARAM_INPUT_6) {
-						dns = p->value().c_str();
-						Serial.print("DNS Address set to: ");
-						Serial.println(dns);
-						// Write file to save value
-						writeFile(SPIFFS, dnsPath, dns.c_str());
-					}
-					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					if (p->name() == PARAM_INPUT_7) {
 						openwk = p->value().c_str();
 						Serial.print("Open Weather API Set to: ");
 						Serial.println(openwk);
 						// Write file to save value
 						writeFile(SPIFFS, openWKPath, openwk.c_str());
 					}
-					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
+					if (p->name() == PARAM_INPUT_4) {
+						latitude = p->value().c_str();
+						Serial.print("Latitude Set to: ");
+						Serial.println(latitude);
+						// Write file to save value
+						writeFile(SPIFFS, latitudePath, latitude.c_str());
+					}
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
+					if (p->name() == PARAM_INPUT_5) {
+						longitude = p->value().c_str();
+						Serial.print("Longitude Set to: ");
+						Serial.println(longitude);
+						// Write file to save value
+						writeFile(SPIFFS, longitudePath, longitude.c_str());
+					}
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 				}
 			}
 
-			request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
+			request->send(200, "text/plain", "Done. ESP will restart, connect to your router");
+			// request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
 			delay(3000);
 
 			// After saving the parameters, restart the ESP32
@@ -1455,23 +1481,8 @@ void loop() {
 
 	if (touchValueBackLight < touchThreshold && touchValueDailyHourly < touchThreshold && touchValueMetrixImperial < touchThreshold) {
 
-		ssid = "";
-		pass = "";
-		ip = "";
-		subnet = "";
-		gateway = "";
-		dns = "";
-		openwk = "";
+		factoryReset();
 
-		writeFile(SPIFFS, ssidPath, ssid.c_str());
-		writeFile(SPIFFS, passPath, pass.c_str());
-		writeFile(SPIFFS, ipPath, ip.c_str());
-		writeFile(SPIFFS, subnetPath, subnet.c_str());
-		writeFile(SPIFFS, gatewayPath, gateway.c_str());
-		writeFile(SPIFFS, dnsPath, dns.c_str());
-		writeFile(SPIFFS, openWKPath, openwk.c_str());
-
-		ESP.restart();
 	}
 
 	// Check Open Weather at regular intervals.
@@ -1710,8 +1721,8 @@ void getWeatherData() {
 	//String serverPath = "http://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&APPID=" + openWeatherMapApiKey + "&units=metric" + "&exclude=minutely,hourly,alerts";
 
 	jsonBuffer = httpGETRequest(serverPath.c_str());
-	Serial.println("");
-	Serial.println(jsonBuffer);
+	//Serial.println("");
+	//Serial.println(jsonBuffer);
 	deserializeJson(weatherData, jsonBuffer);
 	JsonObject myObject = weatherData.as<JsonObject>();
 
@@ -1739,38 +1750,38 @@ void getWeatherData() {
 	weatherDesCurrent.remove(0, 1);
 	weatherDesCurrent[0] = toupper(weatherDesCurrent[0]);
 
-	Serial.println(F(""));
-	Serial.print(F("Json Time Zone Offset       : "));
-	Serial.println(daylightOffset_sec);
-	Serial.print(F("Json Variable Current Epoch : "));
-	Serial.println(currentWeatherTime);
-	Serial.print(F("Json Variable Weather ID    : "));
-	Serial.println(currentWeatherNow);
-	Serial.print(F("Json Variable Temperature   : "));
-	Serial.println(tempNow);
-	Serial.print(F("Json Variable Feels Like    : "));
-	Serial.println(feelsLikeTempNow);
-	Serial.print(F("Json Variable Pressure      : "));
-	Serial.println(pressureNow);
-	Serial.print(F("Json Variable Humidity      : "));
-	Serial.println(humidityNow);
-	Serial.print(F("Json Variable Wind Speed    : "));
-	Serial.println(windSpeedNow);
-	Serial.print(F("Json Variable Wind Direction: "));
-	Serial.println(windDirectionNow);
-	Serial.print(F("Json Variable UV Index      : "));
-	Serial.println(uvIndexNow);
-	Serial.print(F("Json Variable Rain Level    : "));
-	Serial.println(rainLevelNow);
-	Serial.print(F("Json Variable Snow Level    : "));
-	Serial.println(snowLevelNow);
-	Serial.print(F("Json Variable Sunrise       : "));
-	Serial.println(sunRiseNow);
-	Serial.print(F("Json Variable Sunset        : "));
-	Serial.println(sunSetNow);
-	Serial.print(F("Json Variable Moon Phase    : "));
-	Serial.println(moonPhaseNow);
-	Serial.println(F(""));
+	//Serial.println(F(""));
+	//Serial.print(F("Json Time Zone Offset       : "));
+	//Serial.println(daylightOffset_sec);
+	//Serial.print(F("Json Variable Current Epoch : "));
+	//Serial.println(currentWeatherTime);
+	//Serial.print(F("Json Variable Weather ID    : "));
+	//Serial.println(currentWeatherNow);
+	//Serial.print(F("Json Variable Temperature   : "));
+	//Serial.println(tempNow);
+	//Serial.print(F("Json Variable Feels Like    : "));
+	//Serial.println(feelsLikeTempNow);
+	//Serial.print(F("Json Variable Pressure      : "));
+	//Serial.println(pressureNow);
+	//Serial.print(F("Json Variable Humidity      : "));
+	//Serial.println(humidityNow);
+	//Serial.print(F("Json Variable Wind Speed    : "));
+	//Serial.println(windSpeedNow);
+	//Serial.print(F("Json Variable Wind Direction: "));
+	//Serial.println(windDirectionNow);
+	//Serial.print(F("Json Variable UV Index      : "));
+	//Serial.println(uvIndexNow);
+	//Serial.print(F("Json Variable Rain Level    : "));
+	//Serial.println(rainLevelNow);
+	//Serial.print(F("Json Variable Snow Level    : "));
+	//Serial.println(snowLevelNow);
+	//Serial.print(F("Json Variable Sunrise       : "));
+	//Serial.println(sunRiseNow);
+	//Serial.print(F("Json Variable Sunset        : "));
+	//Serial.println(sunSetNow);
+	//Serial.print(F("Json Variable Moon Phase    : "));
+	//Serial.println(moonPhaseNow);
+	//Serial.println(F(""));
 
 	// Parse hourly forecasr weather data from Jason.
 
@@ -1985,27 +1996,27 @@ void getWeatherData() {
 	weatherDesFc7.remove(0, 1);
 	weatherDesFc7[0] = toupper(weatherDesFc7[0]);
 
-	Serial.print(F("Json Variable Moon Phase    : "));
-	Serial.println(moonPhaseNow);
-	Serial.println(moonPhaseFc1);
-	Serial.println(moonPhaseFc2);
-	Serial.println(moonPhaseFc3);
-	Serial.println(moonPhaseFc4);
-	Serial.println(moonPhaseFc5);
-	Serial.println(moonPhaseFc6);
-	Serial.println(moonPhaseFc7);
-	Serial.println(F(""));
-#
-	Serial.print(F("Json Variable Rain PoP: "));
-	Serial.println(rainPopNow);
-	Serial.println(rainPopFc1);
-	Serial.println(rainPopFc2);
-	Serial.println(rainPopFc3);
-	Serial.println(rainPopFc4);
-	Serial.println(rainPopFc5);
-	Serial.println(rainPopFc6);
-	Serial.println(rainPopFc7);
-	Serial.println(F(""));
+	//Serial.print(F("Json Variable Moon Phase    : "));
+	//Serial.println(moonPhaseNow);
+	//Serial.println(moonPhaseFc1);
+	//Serial.println(moonPhaseFc2);
+	//Serial.println(moonPhaseFc3);
+	//Serial.println(moonPhaseFc4);
+	//Serial.println(moonPhaseFc5);
+	//Serial.println(moonPhaseFc6);
+	//Serial.println(moonPhaseFc7);
+	//Serial.println(F(""));
+
+	//Serial.print(F("Json Variable Rain PoP: "));
+	//Serial.println(rainPopNow);
+	//Serial.println(rainPopFc1);
+	//Serial.println(rainPopFc2);
+	//Serial.println(rainPopFc3);
+	//Serial.println(rainPopFc4);
+	//Serial.println(rainPopFc5);
+	//Serial.println(rainPopFc6);
+	//Serial.println(rainPopFc7);
+	//Serial.println(F(""));
 
 	//Serial.println(F(""));
 	//Serial.print(F("Json Variable Daily Epoch : "));
@@ -2152,8 +2163,8 @@ void dataDisplayCurrentWeatherDayX(double moonPhaseFc) {
 
 	disableVSPIScreens();
 
-	Serial.print("Day Night: ");
-	Serial.println(dayNight);
+	//Serial.print("Day Night: ");
+	//Serial.println(dayNight);
 
 	enableScreen1();
 
@@ -2299,10 +2310,10 @@ void dataDisplayCurrentWeatherDayX(double moonPhaseFc) {
 	ts = *localtime(&sunRise);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	Serial.println("");
-	Serial.print("Check conversion of sunrise time: ");
-	Serial.printf("%s\n", buf);
-	Serial.println("");
+	//Serial.println("");
+	//Serial.print("Check conversion of sunrise time: ");
+	//Serial.printf("%s\n", buf);
+	//Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -2317,9 +2328,9 @@ void dataDisplayCurrentWeatherDayX(double moonPhaseFc) {
 	ts = *localtime(&sunSet);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	Serial.print("Check conversion of sunset time : ");
-	Serial.printf("%s\n", buf);
-	Serial.println("");
+	//Serial.print("Check conversion of sunset time : ");
+	//Serial.printf("%s\n", buf);
+	//Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -2729,10 +2740,10 @@ void dataDisplayForecastDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	ts = *localtime(&sunRise);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	Serial.println("");
-	Serial.print("Check conversion of sunrise time: ");
-	Serial.printf(buf);
-	Serial.println("");
+	//Serial.println("");
+	//Serial.print("Check conversion of sunrise time: ");
+	//Serial.printf(buf);
+	//Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -2747,9 +2758,9 @@ void dataDisplayForecastDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	ts = *localtime(&sunSet);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	Serial.print("Check conversion of sunset time : ");
-	Serial.printf(buf);
-	Serial.println("");
+	//Serial.print("Check conversion of sunset time : ");
+	//Serial.printf(buf);
+	//Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -3153,7 +3164,6 @@ void wiFiApMode() {
 
 	tft.fillRect(39, 60, 240, 139, LTRED);
 	tft.drawRect(38, 59, 242, 141, BLACK);
-	//tft.drawRect(37, 58, 244, 143, BLACK);
 	tft.setFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
 	tft.setTextColor(WHITE);
@@ -3578,14 +3588,14 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 	int tempPressure;
 	tempPressure = pressureHr3 - pressureHr1;
 
-	Serial.print("Pressure Differece = ");
-	Serial.println(tempPressure);
-	Serial.println("");
+	//Serial.print("Pressure Differece = ");
+	//Serial.println(tempPressure);
+	//Serial.println("");
 
 	if (tempPressure <= 0) {
 
-		Serial.println("");
-		Serial.print("Pressure is falling function");
+		//Serial.println("");
+		//Serial.print("Pressure is falling function");
 
 		if (tempPressure == 0 || tempPressure == -1) {
 
@@ -3617,8 +3627,8 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 
 	else if (tempPressure > 0) {
 
-		Serial.println("");
-		Serial.print("Pressure is rising function");
+		//Serial.println("");
+		//Serial.print("Pressure is rising function");
 
 		if (tempPressure == 1) {
 
@@ -3993,5 +4003,90 @@ void controlBackLight() {
 		mcp.digitalWrite(TFT_LED8_CTRL, LOW);
 
 	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void factoryReset() {
+
+	// Blank settings.
+
+	ssid = "";
+	pass = "";
+	openwk = "";
+	latitude = "";
+	longitude = "";
+
+	// Write to SPIFFS.
+
+	writeFile(SPIFFS, ssidPath, ssid.c_str());
+	writeFile(SPIFFS, passPath, pass.c_str());
+	writeFile(SPIFFS, openWKPath, openwk.c_str());
+	writeFile(SPIFFS, latitudePath, latitude.c_str());
+	writeFile(SPIFFS, longitudePath, longitude.c_str());
+
+	// Clear screens.
+
+	mcp.digitalWrite(TFT_LED1_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED2_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED3_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED4_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED5_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED6_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED7_CTRL, HIGH);
+	mcp.digitalWrite(TFT_LED8_CTRL, HIGH);
+
+	enableScreen1();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, rainbow, 128, 128);
+
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK);
+	tft.setCursor(96, 200);
+	tft.println("Factory Reset");
+	tft.setFont();
+		
+	disableVSPIScreens();
+
+	enableScreen2();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, fswindsock, 128, 128);
+	disableVSPIScreens();
+
+	enableScreen3();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, fsatmospheric, 128, 128);
+	disableVSPIScreens();
+
+	enableScreen4();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, fshumidity, 128, 128);
+	disableVSPIScreens();
+
+	enableScreen5();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, fsrainfall, 128, 128);
+	disableVSPIScreens();
+
+	enableScreen6();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, fstemperature, 128, 128);
+	disableVSPIScreens();
+
+	enableScreen7();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, fsuv, 128, 128);
+	disableVSPIScreens();
+
+	enableScreen8();
+	tft.fillScreen(WHITE);
+	drawBitmap(tft, 48, 96, fsweathervain, 128, 128);
+	disableVSPIScreens();
+
+	delay(4000);
+
+	ESP.restart();
 
 } // Close function.

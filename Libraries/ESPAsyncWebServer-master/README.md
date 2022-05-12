@@ -235,25 +235,25 @@ int headers = request->headers();
 int i;
 for(i=0;i<headers;i++){
   AsyncWebHeader* h = request->getHeader(i);
-  Serial.printf("HEADER[%s]: %s\n", h->name().c_str(), h->value().c_str());
+  debugf("HEADER[%s]: %s\n", h->name().c_str(), h->value().c_str());
 }
 
 //get specific header by name
 if(request->hasHeader("MyHeader")){
   AsyncWebHeader* h = request->getHeader("MyHeader");
-  Serial.printf("MyHeader: %s\n", h->value().c_str());
+  debugf("MyHeader: %s\n", h->value().c_str());
 }
 
 //List all collected headers (Compatibility)
 int headers = request->headers();
 int i;
 for(i=0;i<headers;i++){
-  Serial.printf("HEADER[%s]: %s\n", request->headerName(i).c_str(), request->header(i).c_str());
+  debugf("HEADER[%s]: %s\n", request->headerName(i).c_str(), request->header(i).c_str());
 }
 
 //get specific header by name (Compatibility)
 if(request->hasHeader("MyHeader")){
-  Serial.printf("MyHeader: %s\n", request->header("MyHeader").c_str());
+  debugf("MyHeader: %s\n", request->header("MyHeader").c_str());
 }
 ```
 
@@ -264,11 +264,11 @@ int params = request->params();
 for(int i=0;i<params;i++){
   AsyncWebParameter* p = request->getParam(i);
   if(p->isFile()){ //p->isPost() is also true
-    Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+    debugf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
   } else if(p->isPost()){
-    Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+    debugf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
   } else {
-    Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+    debugf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
   }
 }
 
@@ -287,7 +287,7 @@ if(request->hasParam("download", true, true))
 //List all parameters (Compatibility)
 int args = request->args();
 for(int i=0;i<args;i++){
-  Serial.printf("ARG[%s]: %s\n", request->argName(i).c_str(), request->arg(i).c_str());
+  debugf("ARG[%s]: %s\n", request->argName(i).c_str(), request->arg(i).c_str());
 }
 
 //Check if parameter exists (Compatibility)
@@ -299,13 +299,13 @@ if(request->hasArg("download"))
 ```cpp
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
   if(!index){
-    Serial.printf("UploadStart: %s\n", filename.c_str());
+    debugf("UploadStart: %s\n", filename.c_str());
   }
   for(size_t i=0; i<len; i++){
     Serial.write(data[i]);
   }
   if(final){
-    Serial.printf("UploadEnd: %s, %u B\n", filename.c_str(), index+len);
+    debugf("UploadEnd: %s, %u B\n", filename.c_str(), index+len);
   }
 }
 ```
@@ -314,13 +314,13 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
 ```cpp
 void handleBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
   if(!index){
-    Serial.printf("BodyStart: %u B\n", total);
+    debugf("BodyStart: %u B\n", total);
   }
   for(size_t i=0; i<len; i++){
     Serial.write(data[i]);
   }
   if(index + len == total){
-    Serial.printf("BodyEnd: %u B\n", total);
+    debugf("BodyEnd: %u B\n", total);
   }
 }
 ```
@@ -1152,7 +1152,7 @@ void setup(){
   // setup ......
   events.onConnect([](AsyncEventSourceClient *client){
     if(client->lastId()){
-      Serial.printf("Client reconnected! Last message ID that it gat is: %u\n", client->lastId());
+      debugf("Client reconnected! Last message ID that it gat is: %u\n", client->lastId());
     }
     //send event with message "hello!", id current millis
     // and set reconnect delay to 1 second
@@ -1294,7 +1294,7 @@ void setup(){
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.printf("WiFi Failed!\n");
+    debugf("WiFi Failed!\n");
     return;
   }
 
@@ -1338,7 +1338,7 @@ void setup(){
     request->send(response);
   },[](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
     if(!index){
-      Serial.printf("Update Start: %s\n", filename.c_str());
+      debugf("Update Start: %s\n", filename.c_str());
       Update.runAsync(true);
       if(!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)){
         Update.printError(Serial);
@@ -1351,7 +1351,7 @@ void setup(){
     }
     if(final){
       if(Update.end(true)){
-        Serial.printf("Update Success: %uB\n", index+len);
+        debugf("Update Success: %uB\n", index+len);
       } else {
         Update.printError(Serial);
       }
@@ -1373,7 +1373,7 @@ void setup(){
 
 void loop(){
   if(shouldReboot){
-    Serial.println("Rebooting...");
+    debugln("Rebooting...");
     delay(100);
     ESP.restart();
   }

@@ -5,18 +5,18 @@ html {
 }
 h1 {
   font-size: 1.8rem; 
-  color: white;
+  color: #034078;
 }
 p { 
   font-size: 1.4rem;
 }
 .topnav { 
   overflow: hidden; 
-  background-color: #f59f2f;
+  background-color: #ffffff;
 }
 body {  
   margin: 0;
-  background-color: #f59f2f;
+  background-color: #ffffff;
 }
 .content { 
   padding: 25px;

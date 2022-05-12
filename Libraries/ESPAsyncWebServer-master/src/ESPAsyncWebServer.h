@@ -44,7 +44,7 @@
 #define ASYNCWEBSERVER_REGEX_ATTRIBUTE __attribute__((warning("ASYNCWEBSERVER_REGEX not defined")))
 #endif
 
-#define DEBUGF(...) //Serial.printf(__VA_ARGS__)
+#define DEBUGF(...) //debugf(__VA_ARGS__)
 
 class AsyncWebServer;
 class AsyncWebServerRequest;
