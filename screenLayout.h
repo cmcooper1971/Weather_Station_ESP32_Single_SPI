@@ -124,8 +124,8 @@
 #define SENSOR_ICON_R 6
 
 // WiFi icon position and size.
-#define WIFI_ICON_X 210
-#define WIFI_ICON_Y 13
+#define WIFI_ICON_X 248
+#define WIFI_ICON_Y 20
 #define WIFI_ICON_W 32
 #define WIFI_ICON_H 32
 

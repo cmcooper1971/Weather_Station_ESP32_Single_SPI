@@ -129,6 +129,7 @@ const char* PARAM_INPUT_3 = "ip";
 const char* PARAM_INPUT_4 = "subnet";
 const char* PARAM_INPUT_5 = "gateway";
 const char* PARAM_INPUT_6 = "dns";
+const char* PARAM_INPUT_7 = "openwk";
 
 // Variables to save values from HTML form.
 
@@ -138,6 +139,7 @@ String ip;
 String subnet;
 String gateway;
 String dns;
+String openwk;
 
 // File paths to save input values permanently.
 
@@ -147,6 +149,7 @@ const char* ipPath = "/ip.txt";
 const char* subnetPath = "/subnet.txt";
 const char* gatewayPath = "/gateway.txt";
 const char* dnsPath = "/dns.txt";
+const char* openWKPath = "/openwk.txt";
 
 // Network variables.
 
@@ -162,7 +165,7 @@ DynamicJsonDocument weatherData(35788); //35788
 
 // Open Weather - your domain name with URL path or IP address with path.
 
-String openWeatherMapApiKey = "03460ae66bafdbb98dac33a0f7509330";
+//String openWeatherMapApiKey = "03460ae66bafdbb98dac33a0f7509330";
 
 // Replace with your country code and city.
 
@@ -468,16 +471,21 @@ bool initWiFi() {
 
 	// Check if settings are available to connect to WiFi.
 
-	if (ssid == "" || ip == "") {
-		Serial.println("Undefined SSID or IP address.");
+	//if (ssid == "" || ip == "") {
+	//	Serial.println("Undefined SSID or IP address.");
+	//	return false;
+	//}
+
+	if (ssid == "" || pass == "" || openwk == "") {
+		Serial.println("Undefined SSID, Password or Open Weather Key.");
 		return false;
 	}
 
 	WiFi.mode(WIFI_STA);
-	localIP.fromString(ip.c_str());
-	Gateway.fromString(gateway.c_str());
-	Subnet.fromString(subnet.c_str());
-	dns1.fromString(dns.c_str());
+	//localIP.fromString(ip.c_str());
+	//Gateway.fromString(gateway.c_str());
+	//Subnet.fromString(subnet.c_str());
+	//dns1.fromString(dns.c_str());
 
 	if (!WiFi.config(localIP, Gateway, Subnet, dns1)) {
 		Serial.println("STA Failed to configure");
@@ -491,7 +499,7 @@ bool initWiFi() {
 
 	enableScreen1();
 
-	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiBlue, WIFI_ICON_W, WIFI_ICON_H);
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
 
 	disableVSPIScreens();
 
@@ -505,7 +513,6 @@ bool initWiFi() {
 			// If ESP32 fails to connect, recolour WiFi to red.
 			enableScreen1();
 			drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
-			drawBlackBox();
 			disableVSPIScreens();
 			return false;
 		}
@@ -591,7 +598,7 @@ bool initWiFi() {
 	tft.print("Unit is starting...");
 	tft.setFont();
 
-	delay(3000);	// Wait a moment.
+	delay(2000);	// Wait a moment.
 
 	tft.fillScreen(WHITE);
 
@@ -1028,19 +1035,35 @@ void setup() {
 
 	// Load values saved in SPIFFS.
 
-	ssid = "BT-7FA3K5";									// Remove these lines before final build.
-	pass = "iKD94Y3K4Qvkck";
-	ip = "192.168.1.200";
-	subnet = "255.255.255.0";
-	gateway = "192.168.1.254";
-	dns = "192.168.1.254";
+	//ssid = "BT-7FA3K5";									// Remove these lines before final build.
+	//pass = "iKD94Y3K4Qvkck";
+	//ip = "192.168.1.200";
+	//subnet = "255.255.255.0";
+	//gateway = "192.168.1.254";
+	//dns = "192.168.1.254";
 
-	writeFile(SPIFFS, ssidPath, ssid.c_str());
-	writeFile(SPIFFS, passPath, pass.c_str());
-	writeFile(SPIFFS, ipPath, ip.c_str());
-	writeFile(SPIFFS, subnetPath, subnet.c_str());
-	writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	writeFile(SPIFFS, dnsPath, dns.c_str());
+	//writeFile(SPIFFS, ssidPath, ssid.c_str());
+	//writeFile(SPIFFS, passPath, pass.c_str());
+	//writeFile(SPIFFS, ipPath, ip.c_str());
+	//writeFile(SPIFFS, subnetPath, subnet.c_str());
+	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	//writeFile(SPIFFS, dnsPath, dns.c_str());
+
+	//ssid = "blank";
+	//pass = "blank";
+	//ip = "blank";
+	//subnet = "blank";
+	//gateway = "blank";
+	//dns = "blank";
+	//openwk= "Test";
+
+	//writeFile(SPIFFS, ssidPath, ssid.c_str());
+	//writeFile(SPIFFS, passPath, pass.c_str());
+	//writeFile(SPIFFS, ipPath, ip.c_str());
+	//writeFile(SPIFFS, subnetPath, subnet.c_str());
+	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	//writeFile(SPIFFS, dnsPath, dns.c_str());
+	//writeFile(SPIFFS, openWKPath, openwk.c_str());
 
 	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
@@ -1049,6 +1072,7 @@ void setup() {
 	subnet = readFile(SPIFFS, subnetPath);
 	gateway = readFile(SPIFFS, gatewayPath);
 	dns = readFile(SPIFFS, dnsPath);
+	openwk = readFile(SPIFFS, openWKPath);
 
 	Serial.println();
 	Serial.println(ssid);
@@ -1057,6 +1081,7 @@ void setup() {
 	Serial.println(subnet);
 	Serial.println(gateway);
 	Serial.println(dns);
+	Serial.println(openwk);
 	Serial.println();
 
 	if (initWiFi()) {
@@ -1142,6 +1167,8 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, ssidPath, ssid.c_str());
 					}
+					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
 					// HTTP POST pass value
 					if (p->name() == PARAM_INPUT_2) {
 						pass = p->value().c_str();
@@ -1150,6 +1177,8 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, passPath, pass.c_str());
 					}
+					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
 					// HTTP POST ip value
 					if (p->name() == PARAM_INPUT_3) {
 						ip = p->value().c_str();
@@ -1158,6 +1187,8 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, ipPath, ip.c_str());
 					}
+					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
 					// HTTP POST ip value
 					if (p->name() == PARAM_INPUT_4) {
 						subnet = p->value().c_str();
@@ -1166,6 +1197,8 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, subnetPath, subnet.c_str());
 					}
+					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
 					// HTTP POST ip value
 					if (p->name() == PARAM_INPUT_5) {
 						gateway = p->value().c_str();
@@ -1174,6 +1207,8 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, gatewayPath, gateway.c_str());
 					}
+					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
 					// HTTP POST ip value
 					if (p->name() == PARAM_INPUT_6) {
 						dns = p->value().c_str();
@@ -1182,7 +1217,17 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, dnsPath, dns.c_str());
 					}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+
+					// HTTP POST ip value
+					if (p->name() == PARAM_INPUT_7) {
+						openwk = p->value().c_str();
+						Serial.print("Open Weather API Set to: ");
+						Serial.println(openwk);
+						// Write file to save value
+						writeFile(SPIFFS, openWKPath, openwk.c_str());
+					}
+					Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 				}
 			}
 
@@ -1196,34 +1241,10 @@ void setup() {
 
 		server.begin();
 
-		enableScreen1();
-
-		tft.fillRect(39, 60, 183, 109, RED);
-		tft.drawRect(38, 59, 185, 111, WHITE);
-		tft.drawRect(37, 58, 187, 113, WHITE);
-		tft.setFont(&FreeSans9pt7b);
-		tft.setTextSize(1);
-		tft.setTextColor(WHITE);
-		tft.setCursor(50, 78);
-		tft.print("Access Point Mode");
-
-		tft.setFont();
-		tft.setTextColor(WHITE);
-		tft.setCursor(50, 90);
-		tft.print("Could not connect to WiFi");
-		tft.setCursor(50, 106);
-		tft.print("1) Using your mobile phone");
-		tft.setCursor(50, 118);
-		tft.print("2) Connect to WiFI Manager");
-		tft.setCursor(50, 130);
-		tft.print("3) Browse to 192.168.4.1");
-		tft.setCursor(50, 142);
-		tft.print("4) Enter network settings");
-		tft.setCursor(50, 154);
-		tft.print("5) Unit will then restart");
+		wiFiApMode();
 
 		unsigned long previousMillis = millis();
-		unsigned long interval = 120000;
+		unsigned long interval = 300000;
 
 		while (1) {
 
@@ -1245,7 +1266,7 @@ void setup() {
 
 	disableVSPIScreens();
 
-	enableScreen1();
+	//enableScreen1();
 
 	// Draw grid for space screen design
 
@@ -1428,6 +1449,29 @@ void loop() {
 			sleepScreenTime = millis();
 		}
 
+	}
+
+	// Check if settings to be reset.
+
+	if (touchValueBackLight < touchThreshold && touchValueDailyHourly < touchThreshold && touchValueMetrixImperial < touchThreshold) {
+
+		ssid = "";
+		pass = "";
+		ip = "";
+		subnet = "";
+		gateway = "";
+		dns = "";
+		openwk = "";
+
+		writeFile(SPIFFS, ssidPath, ssid.c_str());
+		writeFile(SPIFFS, passPath, pass.c_str());
+		writeFile(SPIFFS, ipPath, ip.c_str());
+		writeFile(SPIFFS, subnetPath, subnet.c_str());
+		writeFile(SPIFFS, gatewayPath, gateway.c_str());
+		writeFile(SPIFFS, dnsPath, dns.c_str());
+		writeFile(SPIFFS, openWKPath, openwk.c_str());
+
+		ESP.restart();
 	}
 
 	// Check Open Weather at regular intervals.
@@ -1660,7 +1704,7 @@ void getWeatherData() {
 
 	// Open Weather Request.
 
-	String serverPath = "http://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&APPID=" + openWeatherMapApiKey + "&units=metric" + "&exclude=minutely,alerts";  //,hourly
+	String serverPath = "http://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&APPID=" + openwk + "&units=metric" + "&exclude=minutely,alerts";  //,hourly
 
 	//String serverPath = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "," + countryCode + "&APPID=" + openWeatherMapApiKey + "&units=metric";
 	//String serverPath = "http://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&APPID=" + openWeatherMapApiKey + "&units=metric" + "&exclude=minutely,hourly,alerts";
@@ -3064,6 +3108,78 @@ void wiFiTitle() {
 	tft.print("Signal Strenght: ");
 	tft.setCursor(23, 140);
 	tft.print("Time Server: ");
+
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK);
+	tft.println("");
+	tft.setCursor(20, 175);
+	tft.print("Unit is starting...");
+	tft.setFont();
+
+	disableVSPIScreens();
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// WiFi title page.
+
+void wiFiApMode() {
+
+	// WiFi AP mode title screen.
+
+	enableScreen1();
+
+	tft.fillScreen(WHITE);
+
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK);
+	tft.setCursor(13, 26);
+	tft.println("Switching Wi-Fi Mode");
+	tft.setFont();
+
+	delay(2000);
+
+	tft.fillScreen(WHITE);
+
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(BLACK);
+	tft.setCursor(13, 26);
+	tft.println("Access Point Mode");
+	tft.setFont();
+
+	tft.fillRect(39, 60, 240, 139, LTRED);
+	tft.drawRect(38, 59, 242, 141, BLACK);
+	//tft.drawRect(37, 58, 244, 143, BLACK);
+	tft.setFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(WHITE);
+	tft.setCursor(50, 78);
+	tft.print("Follow these instructions:");
+
+	tft.setFont();
+	tft.setTextColor(WHITE);
+	tft.setCursor(50, 90);
+	tft.print("We could not connect to last Wi-Fi");
+	tft.setCursor(50, 106);
+	tft.print("1) Using your mobile phone Wi-Fi");
+	tft.setCursor(50, 118);
+	tft.print("2) Connect to WiFI-Manager network");
+	tft.setCursor(50, 130);
+	tft.print("3) Browse to web address 192.168.4.1");
+	tft.setCursor(50, 142);
+	tft.print("4) Enter network settings");
+	tft.setCursor(50, 154);
+	tft.print("5) Unit will auto restart when saved");
+	tft.setCursor(50, 166);
+	tft.print("");
+	tft.setCursor(50, 185);
+	tft.print("Call Christopher Cooper for Support");
+
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAp, WIFI_ICON_W, WIFI_ICON_H);
 
 	disableVSPIScreens();
 

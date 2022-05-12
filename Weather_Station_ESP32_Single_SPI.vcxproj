@@ -164,7 +164,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties arduino.upload.port="COM11" config.Debug.customdebug_esp32_esp32_debugger_type="universal" config.Release.customdebug_esp32_esp32_debugger_type="none" debug.local.portname="" debug.local.portspeed="" debug.remote.portname="" debug.remote.portspeed="" debug.view.AnalogPins="" debug.view.DigitalPins="" debug.view.FreeMemory="" debug.view.RunMonitorsOnAllBP="" />
+      <UserProperties arduino.upload.port="COM11" config.Debug.customdebug_esp32_esp32_debugger_type="universal" config.Release.customdebug_esp32_esp32_debugger_type="none" custom_esp32_esp32_FlashSize="4M" custom_esp32_esp32_PartitionScheme="huge_app" debug.local.portname="" debug.local.portspeed="" debug.remote.portname="" debug.remote.portspeed="" debug.view.AnalogPins="" debug.view.DigitalPins="" debug.view.FreeMemory="" debug.view.RunMonitorsOnAllBP="" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
