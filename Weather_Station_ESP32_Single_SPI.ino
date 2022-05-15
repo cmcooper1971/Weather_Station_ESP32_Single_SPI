@@ -17,10 +17,11 @@
 #include <SPIFFS.h>
 #include <ArduinoJSON.h>
 #include <Adafruit_MCP23X08.h>		// Additional I/O port expander
+#include <EEPROM.h>
 
 #include <Fonts/FreeSans9pt7b.h>	
 #include <Fonts/FreeSans12pt7b.h>
-#include <EEPROM.h>
+
 
 #include "getHeading.h"				// Convert headings to N/S/E/W
 #include "tftControl.h"				// Enable / disable displays
