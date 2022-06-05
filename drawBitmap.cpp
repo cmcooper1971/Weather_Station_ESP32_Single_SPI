@@ -6,6 +6,8 @@
 #include <Adafruit_ILI9341.h>
 #include "drawBitmap.h"
 
+// Thanks to https://github.com/KrisKasprzak
+
 /*-----------------------------------------------------------------*/
 
 void drawBitmap(Adafruit_ILI9341& tft, int x, int y, const uint16_t* bitmap, int bw, int bh) {

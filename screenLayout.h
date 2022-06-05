@@ -118,26 +118,16 @@
 #define MOONPHASE_W 26
 #define MOONPHASE_H 26
 
-// Sensor icon position and size.
-#define SENSOR_ICON_X 196
-#define SENSOR_ICON_Y 20
-#define SENSOR_ICON_R 6
-
 // WiFi icon position and size.
 #define WIFI_ICON_X 248
 #define WIFI_ICON_Y 20
 #define WIFI_ICON_W 32
 #define WIFI_ICON_H 32
 
-// Settings Cog position and size.
-#define SETTINGS_COG_X 233
-#define SETTINGS_COG_Y 13
-#define SETTINGS_COG_W 16
-#define SETTINGS_COG_H 16
-
-// XPH Dial and position
-#define dialY 120
-#define dialX 131
+// Http error dot.
+#define SENSOR_ICON_X 310
+#define SENSOR_ICON_Y 230
+#define SENSOR_ICON_R 6
 
 // Bar charts position and size.
 

@@ -17,11 +17,9 @@
 #include <SPIFFS.h>
 #include <ArduinoJSON.h>
 #include <Adafruit_MCP23X08.h>		// Additional I/O port expander
-#include <EEPROM.h>
 
 #include <Fonts/FreeSans9pt7b.h>	
 #include <Fonts/FreeSans12pt7b.h>
-
 
 #include "getHeading.h"				// Convert headings to N/S/E/W
 #include "tftControl.h"				// Enable / disable displays
@@ -34,7 +32,7 @@
 #include "colours.h"                // Colours
 #include "screenLayout.h"			// Screen layout
 #include "iconsStart.h"				// Start up bitmaps
-#include "icons.h"					// Weather bitmaps
+#include "icons.h"					// Screen bitmaps
 #include "iconsAtmosphere.h"		// Weather bitmaps
 #include "iconsClear.h"				// Weather bitmaps
 #include "iconsClouds.h"			// Weather bitmaps
@@ -42,7 +40,7 @@
 #include "iconsRain.h"				// Weather bitmaps
 #include "iconsSnow.h"				// Weather bitmaps
 #include "iconsThunderstorms.h"		// Weather bitmaps
-#include "iconsMoonPhase.h"			// Weather bitmaps
+#include "iconsMoonPhase.h"			// Moonphase bitmaps
 
 // TFT SPI Interface for ESP32.
 
@@ -52,7 +50,7 @@
 #define VSPI_DC     4  // DC
 #define VSPI_RST    13 // RST							
 
-#define VSPI_CS0	36 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes.
+#define VSPI_CS0	36 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes
 #define VSPI_CS1    5  // Screen one chip select
 #define VSPI_CS2    17 // Screen two chip select
 #define VSPI_CS3    16 // Screen three chip select
@@ -78,6 +76,10 @@
 #define TFT_LED8_CTRL	0 // GPIO MCP23008
 
 #define MCP23008_RST	27// Reset MCP23008 line
+
+// Http error status.
+
+byte sensorT = 0;
 
 // Configure switches.
 
@@ -108,49 +110,30 @@ ESP32Time rtc;
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 0;
 int			daylightOffset_sec = 0;
-long		LocalTime;
-int			localTimeInterval = 60000;
 
 // Web Server configuration.
 
 AsyncWebServer server(80);			// Create AsyncWebServer object on port 80
 AsyncEventSource events("/events");	// Create an Event Source on /events
 
-// WiFi Configuration.
-
-boolean wiFiYN;						// WiFi reset
-boolean apMode = false;
-
 // Search for parameter in HTTP POST request.
 
 const char* PARAM_INPUT_1 = "ssid";
 const char* PARAM_INPUT_2 = "pass";
-//const char* PARAM_INPUT_3 = "ip";
-//const char* PARAM_INPUT_4 = "subnet";
-//const char* PARAM_INPUT_5 = "gateway";
-//const char* PARAM_INPUT_6 = "dns";
 const char* PARAM_INPUT_3 = "openwk";
 const char* PARAM_INPUT_4 = "latitude";
 const char* PARAM_INPUT_5 = "longitude";
 
 // Variables to save values from HTML form.
 
-String ssid;
-String pass;
-//String ip;
-//String subnet;
-//String gateway;
-//String dns;
-String openwk;
+String ssid;			// WiFi SSID
+String pass;			// WiFi password
+String openwk;			// Openweather API key
 
 // File paths to save input values permanently.
 
 const char* ssidPath = "/ssid.txt";
 const char* passPath = "/pass.txt";
-//const char* ipPath = "/ip.txt";
-//const char* subnetPath = "/subnet.txt";
-//const char* gatewayPath = "/gateway.txt";
-//const char* dnsPath = "/dns.txt";
 const char* openWKPath = "/openwk.txt";
 const char* latitudePath = "/latitude.txt";
 const char* longitudePath = "/longitude.txt";
@@ -167,18 +150,12 @@ IPAddress dns1;
 String jsonBuffer;
 DynamicJsonDocument weatherData(35788); //35788
 
-// Open Weather - your domain name with URL path or IP address with path.
+// Forecast weather location.
 
-//String openWeatherMapApiKey = "03460ae66bafdbb98dac33a0f7509330";
-
-// Replace with your country code and city.
-
-//String city = "Norwich";
-//String countryCode = "GB";
 String latitude;	// "52.628101";
 String longitude;	// "1.299350";
 
-// Timer debounce
+// Timer debounce.
 
 long lastDebounceTimeBkL = 0;				// Debounce timing for backlight
 const long debounceDelayBkL = 200;			// Debounce delay timing for backlight
@@ -189,23 +166,17 @@ const long debounceDelayDH = 200;			// Debounce delay timing for day hourly chan
 long lastDebounceTimeMI = 0;				// Debounce timing for metric imperial change
 const long debounceDelayMI = 200;			// Debounce delay timing for metric imperial change
 
-
 // Timer variables (check Open Weather).
 
 unsigned long intervalTGetData = 0;
-const unsigned long intervalPGetData = 900000;			// Reset to 300,000 when finished with design (5 minutes sleep time)
+const unsigned long intervalPGetData = 3600000; // Reset to 3600000 when finished with design (once per hour)
 
 // Timer variables (check wifi).
 
-unsigned long wiFiR = 0;					// WiFi retry (wiFiR) to attempt connecting to the last known WiFi if connection lost
+unsigned long wiFiR = 180000;				// WiFi retry (wiFiR) to attempt connecting to the last known WiFi if connection lost
 unsigned long wiFiRI = 60000;				// WiFi retry Interval (wiFiRI) used to retry connecting to the last known WiFi if connection lost
 unsigned long previousMillis = 0;			// Used in the WiFI Init function
 const long interval = 10000;				// Interval to wait for Wi-Fi connection (milliseconds)
-
-// Timer variables (to update web server).
-
-unsigned long lastTime = 0;
-unsigned long timerDelay = 30000;
 
 // Timer variables (changing temperature readings).
 
@@ -213,7 +184,7 @@ boolean flagTempDisplayChange = false;
 unsigned long intervalTTempRotate = 0;
 const unsigned long intervalPTemp = 5000;
 
-// Time variables (sleep screens)
+// Timer variables (sleep screens).
 
 unsigned long sleepScreenTime;
 const unsigned long sleepScreensP = 600000;
@@ -227,7 +198,6 @@ int touchValueMetrixImperial = 25;
 
 // Weather variables.
 
-#define SEALEVELPRESSURE_HPA (1013.25)
 #define windMph (2.237)
 
 // Day or night flag for main current image setting.
@@ -442,6 +412,8 @@ unsigned int pressureHr6;
 unsigned int pressureHr7;
 unsigned int pressureHr8;
 
+// Pressure description array.
+
 char* pressureLevel[] = { "Low", "Normal", "High" };
 
 // Graphing.
@@ -475,21 +447,22 @@ bool initWiFi() {
 
 	// Check if settings are available to connect to WiFi.
 
-	//if (ssid == "" || ip == "") {
+	//	if (ssid == "" || ip == "") {						Removed this code and replaced with below, from Static to DHCP IP config.
 	//	Serial.println("Undefined SSID or IP address.");
 	//	return false;
-	//}
+	//	}
 
 	if (ssid == "" || pass == "" || openwk == "") {
-		//Serial.println("Undefined SSID, Password or Open Weather Key.");
+		// Serial.println("Undefined SSID, Password or Open Weather Key.");
 		return false;
 	}
 
 	WiFi.mode(WIFI_STA);
-	//localIP.fromString(ip.c_str());
-	//Gateway.fromString(gateway.c_str());
-	//Subnet.fromString(subnet.c_str());
-	//dns1.fromString(dns.c_str());
+
+	// localIP.fromString(ip.c_str());						Removed this code as static to DHCP for IP config.
+	// Gateway.fromString(gateway.c_str());					Removed this code as static to DHCP for IP config.
+	// Subnet.fromString(subnet.c_str());					Removed this code as static to DHCP for IP config.
+	// dns1.fromString(dns.c_str());						Removed this code as static to DHCP for IP config.
 
 	if (!WiFi.config(localIP, Gateway, Subnet, dns1)) {
 		Serial.println("STA Failed to configure");
@@ -497,9 +470,10 @@ bool initWiFi() {
 	}
 
 	WiFi.begin(ssid.c_str(), pass.c_str());
-	//Serial.println("Connecting to WiFi...");
 
-	// If ESP32 inits successfully in station mode, recolour WiFi to amber.
+	// Serial.println("Connecting to WiFi...");
+
+	// If ESP32 inits successfully in station mode, recolour WiFi to red.
 
 	enableScreen1();
 
@@ -511,10 +485,15 @@ bool initWiFi() {
 	previousMillis = currentMillis;
 
 	while (WiFi.status() != WL_CONNECTED) {
+
 		currentMillis = millis();
+
 		if (currentMillis - previousMillis >= interval) {
+
 			Serial.println("Failed to connect.");
+
 			// If ESP32 fails to connect, recolour WiFi to red.
+
 			enableScreen1();
 			drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
 			disableVSPIScreens();
@@ -523,10 +502,10 @@ bool initWiFi() {
 
 	}
 
-	Serial.println(WiFi.localIP());
-	Serial.println("");
-	Serial.print("RRSI: ");
-	Serial.println(WiFi.RSSI());
+	// Serial.println(WiFi.localIP());
+	// Serial.println("");
+	// Serial.print("RRSI: ");
+	// Serial.println(WiFi.RSSI());
 
 	// Update TFT with settings.
 
@@ -621,25 +600,68 @@ String httpGETRequest(const char* serverName) {
 	WiFiClient client;
 	HTTPClient http;
 
-	// Your Domain name with URL path or IP address with path
+	// Your Domain name with URL path or IP address with path.
+
 	http.begin(client, serverName);
 
-	// Send HTTP POST request
+	// Send HTTP POST request.
+
 	int httpResponseCode = http.GET();
 
 	String payload = "{}";
 
-	if (httpResponseCode > 0) {
+	if (httpResponseCode > 0) { 
 		Serial.print("HTTP Response code: ");
 		Serial.println(httpResponseCode);
 		payload = http.getString();
 	}
+
 	else {
 		Serial.print("Error code: ");
 		Serial.println(httpResponseCode);
 	}
-	// Free resources
+
+	// HTTP Response codes:
+	// 0 = Blue = 429 = Calls exceeds account limit
+	// 1 = Red = 401 = API key problem
+	// 2 = Yellow = 404 = Incorrect city name, ZIP or city ID
+	// 3 = Orange = 50X = You have to contact Open Weather
+	// 4 = Green = 200 = Correct reponse
+
+	if (httpResponseCode == 429) {
+
+		sensorT = 0; // Blue
+	}
+
+	else if (httpResponseCode == 401) {
+
+		sensorT = 1; // Red
+	}
+
+	else if (httpResponseCode == 404) {
+
+		sensorT = 2; // Yellow
+	}
+
+	else if (httpResponseCode > 499 && httpResponseCode < 505) {
+
+		sensorT = 3; // Orange
+	}
+
+	else if (httpResponseCode == 200) {
+
+		sensorT = 4; // Green
+	}
+
+	else {
+		sensorT = 5; // Green
+	}
+
+	// Free resources.
+
 	http.end();
+
+	drawHttpError();
 
 	return payload;
 
@@ -647,16 +669,14 @@ String httpGETRequest(const char* serverName) {
 
 /*-----------------------------------------------------------------*/
 
-// Return JSON String from sensor Readings
+// Return JSON String from sensor Readings.
+
+// Not using in this sketch as not running a webserver.
 
 String getJSONReadings() {
 
-	int tempMaxSpeed;			// This needs editing as it was from PetBit.
-
-	//readings["tempMaxSpeed"] = String(tempMaxSpeed);
-
-	//String jsonString = JSON.stringify(readings);
-	//return jsonString;
+	// String jsonString = JSON.stringify(readings);
+	// return jsonString;
 
 }  // Close function.
 
@@ -744,7 +764,7 @@ void printLocalTime() {
 
 	if (!getLocalTime(&timeinfo)) {
 
-		//Serial.println("Failed, time set to default.");
+		// Serial.println("Failed, time set to default.");
 
 		// Set time manually.
 
@@ -763,9 +783,9 @@ void printLocalTime() {
 		return;
 	}
 
-	//Serial.println("");
-	//Serial.println(&timeinfo, "%A, %B %d %Y %H:%M %Z");
-	//Serial.println("");
+	// Serial.println("");
+	// Serial.println(&timeinfo, "%A, %B %d %Y %H:%M %Z");
+	// Serial.println("");
 
 	// Text block to over write characters from longer dates when date changes and unit has been running.
 
@@ -787,7 +807,6 @@ void printLocalTime() {
 
 	disableVSPIScreens();
 
-
 } // Close function.
 
 /*-----------------------------------------------------------------*/
@@ -800,7 +819,7 @@ void setup() {
 
 	// Enable I2C Devices.
 
-	Serial.println(F("MCP23008 start"));
+	// Serial.println(F("MCP23008 start"));
 
 	mcp.begin_I2C();
 
@@ -822,11 +841,11 @@ void setup() {
 	touchValueDailyHourly = touchRead(espTouchDailyHourly);
 	touchValueMetrixImperial = touchRead(espTouchMetricImperial);
 
-	//Serial.println("Touch Values:");
-	//Serial.println(touchValueBackLight);
-	//Serial.println(touchValueDailyHourly);
-	//Serial.println(touchValueMetrixImperial);
-	//Serial.println("");
+	// Serial.println("Touch Values:");
+	// Serial.println(touchValueBackLight);
+	// Serial.println(touchValueDailyHourly);
+	// Serial.println(touchValueMetrixImperial);
+	// Serial.println("");
 
 	// Reset MCP23008 port driver.
 
@@ -898,7 +917,6 @@ void setup() {
 
 	// Send screen configuration.
 
-	//tft1.begin();
 	tft.begin(40000000); // 40000000 27000000
 	tft.setRotation(3);
 	tft.setCursor(0, 0);
@@ -906,11 +924,6 @@ void setup() {
 	// Reset all chip selects high once again.
 
 	disableVSPIScreens();
-
-	// Start touch sensor.
-
-	//digitalWrite(touch_CS, HIGH);
-	//delay(10);
 
 	// Start up screen image and title.
 
@@ -1039,58 +1052,55 @@ void setup() {
 
 	// Load values saved in SPIFFS.
 
-	//ssid = "BT-7FA3K5";									// Remove these lines before final build.
-	//pass = "iKD94Y3K4Qvkck";
-	//ip = "192.168.1.200";
-	//subnet = "255.255.255.0";
-	//gateway = "192.168.1.254";
-	//dns = "192.168.1.254";
+	// ssid = "";									// Remove these lines before final build.
+	// pass = "";
+	// ip = "192.168.1.200";
+	// subnet = "255.255.255.0";
+	// gateway = "192.168.1.254";
+	// dns = "192.168.1.254";
 
-	//writeFile(SPIFFS, ssidPath, ssid.c_str());
-	//writeFile(SPIFFS, passPath, pass.c_str());
-	//writeFile(SPIFFS, ipPath, ip.c_str());
-	//writeFile(SPIFFS, subnetPath, subnet.c_str());
-	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	//writeFile(SPIFFS, dnsPath, dns.c_str());
+	// writeFile(SPIFFS, ssidPath, ssid.c_str());
+	// writeFile(SPIFFS, passPath, pass.c_str());
+	// writeFile(SPIFFS, ipPath, ip.c_str());
+	// writeFile(SPIFFS, subnetPath, subnet.c_str());
+	// writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	// writeFile(SPIFFS, dnsPath, dns.c_str());
 
-	//ssid = "blank";
-	//pass = "blank";
-	//ip = "blank";
-	//subnet = "blank";
-	//gateway = "blank";
-	//dns = "blank";
-	//openwk= "Test";
+	// ssid = "blank";
+	// pass = "blank";
+	// ip = "blank";
+	// subnet = "blank";
+	// gateway = "blank";
+	// dns = "blank";
+	// openwk= "Test";
 
-	//writeFile(SPIFFS, ssidPath, ssid.c_str());
-	//writeFile(SPIFFS, passPath, pass.c_str());
-	//writeFile(SPIFFS, ipPath, ip.c_str());
-	//writeFile(SPIFFS, subnetPath, subnet.c_str());
-	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	//writeFile(SPIFFS, dnsPath, dns.c_str());
-	//writeFile(SPIFFS, openWKPath, openwk.c_str());
+	// writeFile(SPIFFS, ssidPath, ssid.c_str());
+	// writeFile(SPIFFS, passPath, pass.c_str());
+	// writeFile(SPIFFS, ipPath, ip.c_str());
+	// writeFile(SPIFFS, subnetPath, subnet.c_str());
+	// writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	// writeFile(SPIFFS, dnsPath, dns.c_str());
+	// writeFile(SPIFFS, openWKPath, openwk.c_str());
 
-	//Serial.println();
+	// Serial.println();
+
 	ssid = readFile(SPIFFS, ssidPath);
 	pass = readFile(SPIFFS, passPath);
-	//ip = readFile(SPIFFS, ipPath);
-	//subnet = readFile(SPIFFS, subnetPath);
-	//gateway = readFile(SPIFFS, gatewayPath);
-	//dns = readFile(SPIFFS, dnsPath);
 	openwk = readFile(SPIFFS, openWKPath);
 	latitude = readFile(SPIFFS, latitudePath);
 	longitude = readFile(SPIFFS, longitudePath);
 
-	//Serial.println();
-	//Serial.println(ssid);
-	//Serial.println(pass);
-	//Serial.println(ip);
-	//Serial.println(subnet);
-	//Serial.println(gateway);
-	//Serial.println(dns);
-	//Serial.println(openwk);
-	//Serial.println(latitude);
-	//Serial.println(longitude);
-	//Serial.println();
+	// Serial.println();
+	// Serial.println(ssid);
+	// Serial.println(pass);
+	// Serial.println(ip);
+	// Serial.println(subnet);
+	// Serial.println(gateway);
+	// Serial.println(dns);
+	// Serial.println(openwk);
+	// Serial.println(latitude);
+	// Serial.println(longitude);
+	// Serial.println();
 
 	if (initWiFi()) {
 
@@ -1126,10 +1136,7 @@ void setup() {
 
 	else
 
-	{
-		apMode = true;	// Set variable to be true so void loop is by passed and doesnt run until false.
-
-		// WiFi title page.
+	{	// WiFi title page.
 
 		wiFiTitle();
 
@@ -1142,15 +1149,15 @@ void setup() {
 		disableVSPIScreens();
 
 		// Set Access Point.
-		//Serial.println("Setting AP (Access Point)");
+		// Serial.println("Setting AP (Access Point)");
 
 		// NULL sets an open Access Point.
 
 		WiFi.softAP("WIFI-MANAGER", NULL);
 
 		IPAddress IP = WiFi.softAPIP();
-		//Serial.print("AP IP address: ");
-		//Serial.println(IP);
+		// Serial.print("AP IP address: ");
+		// Serial.println(IP);
 
 		// Web Server Root URL For WiFi Manager Web Page.
 
@@ -1175,7 +1182,7 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, ssidPath, ssid.c_str());
 					}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					// Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 
 					// HTTP POST pass value
 					if (p->name() == PARAM_INPUT_2) {
@@ -1185,47 +1192,7 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, passPath, pass.c_str());
 					}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					//if (p->name() == PARAM_INPUT_3) {
-					//	ip = p->value().c_str();
-					//	Serial.print("IP Address set to: ");
-					//	Serial.println(ip);
-					//	// Write file to save value
-					//	writeFile(SPIFFS, ipPath, ip.c_str());
-					//}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					//if (p->name() == PARAM_INPUT_4) {
-					//	subnet = p->value().c_str();
-					//	Serial.print("Subnet Address: ");
-					//	Serial.println(subnet);
-					//	// Write file to save value
-					//	writeFile(SPIFFS, subnetPath, subnet.c_str());
-					//}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					//if (p->name() == PARAM_INPUT_5) {
-					//	gateway = p->value().c_str();
-					//	Serial.print("Gateway set to: ");
-					//	Serial.println(gateway);
-					//	// Write file to save value
-					//	writeFile(SPIFFS, gatewayPath, gateway.c_str());
-					//}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-
-					// HTTP POST ip value
-					//if (p->name() == PARAM_INPUT_6) {
-					//	dns = p->value().c_str();
-					//	Serial.print("DNS Address set to: ");
-					//	Serial.println(dns);
-					//	// Write file to save value
-					//	writeFile(SPIFFS, dnsPath, dns.c_str());
-					//}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					// Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 
 					// HTTP POST ip value
 					if (p->name() == PARAM_INPUT_3) {
@@ -1235,7 +1202,7 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, openWKPath, openwk.c_str());
 					}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					// Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 
 					if (p->name() == PARAM_INPUT_4) {
 						latitude = p->value().c_str();
@@ -1244,7 +1211,7 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, latitudePath, latitude.c_str());
 					}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					// Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 
 					if (p->name() == PARAM_INPUT_5) {
 						longitude = p->value().c_str();
@@ -1253,7 +1220,7 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, longitudePath, longitude.c_str());
 					}
-					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+					// Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 				}
 			}
 
@@ -1261,7 +1228,7 @@ void setup() {
 			// request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
 			delay(3000);
 
-			// After saving the parameters, restart the ESP32
+			// After saving the parameters, restart the ESP32.
 
 			ESP.restart();
 			});
@@ -1279,7 +1246,7 @@ void setup() {
 
 			unsigned long currentMillis = millis();
 
-			// Restart after 2 minutes in case of failed reconnection with correc WiFi details.
+			// Restart after 5 minutes in case of failed reconnection with correc WiFi details.
 
 			if (currentMillis - previousMillis >= interval) {
 
@@ -1290,22 +1257,6 @@ void setup() {
 		}
 
 	}
-
-	disableVSPIScreens();
-
-	//enableScreen1();
-
-	// Draw grid for space screen design
-
-	//for (int x = 20; x < 320; x = x + 20) {
-
-	//	tft.drawFastVLine(x, 0, 240, BLACK);
-	//}
-
-	//for (int x = 20; x < 240; x = x + 20) {
-
-	//	tft.drawFastHLine(0, x, 320, BLACK);
-	//}
 
 	disableVSPIScreens();
 
@@ -1353,7 +1304,6 @@ void setup() {
 
 	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 	printLocalTime();
-	LocalTime = millis();
 
 	// Layout screens & obtain data.
 
@@ -1391,6 +1341,10 @@ void setup() {
 
 	sleepScreenTime = millis() + sleepScreensP;
 
+	// Http error circle.
+
+	tft.drawCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, BLACK);
+
 } // Close setup.
 
 /*-----------------------------------------------------------------*/
@@ -1425,9 +1379,11 @@ void loop() {
 		}
 	}
 
-	// Set daily or hourly view.
+	// Read capacitive touch.
 
 	touchValueDailyHourly = touchRead(espTouchDailyHourly);
+	
+	// Set daily or hourly view.
 
 	if (touchValueDailyHourly < touchThreshold) {
 
@@ -1451,10 +1407,12 @@ void loop() {
 		}
 	}
 
-	// Set metrix or imperial.
-
+	// Read capactive touch.
+	
 	touchValueMetrixImperial = touchRead(espTouchMetricImperial);
 
+	// Set metrix or imperial.
+	
 	if (touchValueMetrixImperial < touchThreshold) {
 
 		if ((millis() - lastDebounceTimeMI) > debounceDelayMI)
@@ -1486,7 +1444,7 @@ void loop() {
 
 	}
 
-	// Check Open Weather at regular intervals.
+	// Check Open Weather at regular intervals (1 hour as free license is limited per day and month).
 
 	if (millis() >= intervalTGetData + intervalPGetData) {
 
@@ -1536,6 +1494,8 @@ void loop() {
 
 		}
 
+		// Update displays as they are set, i.e. Daily or Hourly views
+
 		else {
 
 			enableScreen5();
@@ -1563,6 +1523,8 @@ void loop() {
 		intervalTGetData = millis();
 
 	}
+
+	// Cycle displays for temperature, rain fall and likelyhood of precipitation.
 
 	if (millis() >= intervalTTempRotate + intervalPTemp) {
 
@@ -1697,13 +1659,24 @@ void loop() {
 
 	}
 
-	// Turn off displays after sleep period is reached.
+	// Auto turn off displays after sleep period is reached.
 
 	if (millis() >= sleepScreenTime + sleepScreensP) {
 
 		backLightState = false;
 		controlBackLight();
 
+	}
+
+	// Retry connecting to WiFi if connection is lost.
+
+	unsigned long wiFiRC = millis();
+
+	if ((WiFi.status() != WL_CONNECTED) && (wiFiRC + wiFiR >= wiFiRI)) {
+
+		WiFi.disconnect();
+		WiFi.reconnect();
+		wiFiRI = wiFiRC;
 	}
 
 } // Close loop.
@@ -1714,15 +1687,15 @@ void loop() {
 
 void getWeatherData() {
 
-	// Open Weather Request.
+	// Open Weather Request. 
 
 	String serverPath = "http://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&APPID=" + openwk + "&units=metric" + "&exclude=minutely,alerts";  //,hourly
 
-	//String serverPath = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "," + countryCode + "&APPID=" + openWeatherMapApiKey + "&units=metric";
-	//String serverPath = "http://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&APPID=" + openWeatherMapApiKey + "&units=metric" + "&exclude=minutely,hourly,alerts";
+	// String serverPath = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "," + countryCode + "&APPID=" + openWeatherMapApiKey + "&units=metric";
+	// String serverPath = "http://api.openweathermap.org/data/2.5/onecall?lat=" + latitude + "&lon=" + longitude + "&APPID=" + openWeatherMapApiKey + "&units=metric" + "&exclude=minutely,hourly,alerts";
 
 	jsonBuffer = httpGETRequest(serverPath.c_str());
-	//Serial.println("");
+	Serial.println("");
 	//Serial.println(jsonBuffer);
 	deserializeJson(weatherData, jsonBuffer);
 	JsonObject myObject = weatherData.as<JsonObject>();
@@ -1803,6 +1776,17 @@ void getWeatherData() {
 	rainFallHr6 = (myObject["hourly"][6]["rain"]["1h"]);
 	rainFallHr7 = (myObject["hourly"][7]["rain"]["1h"]);
 	rainFallHr8 = (myObject["hourly"][8]["rain"]["1h"]);
+
+	//Serial.print(F("Json Variable Hourly Rain : "));
+	//Serial.println(rainFallHr1);
+	//Serial.println(rainFallHr2);
+	//Serial.println(rainFallHr3);
+	//Serial.println(rainFallHr4);
+	//Serial.println(rainFallHr5);
+	//Serial.println(rainFallHr6);
+	//Serial.println(rainFallHr7);
+	//Serial.println(rainFallHr8);
+	//Serial.println(F(""));
 
 	pressureHr1 = (myObject["hourly"][1]["pressure"]);
 	pressureHr2 = (myObject["hourly"][2]["pressure"]);
@@ -2164,8 +2148,8 @@ void dataDisplayCurrentWeatherDayX(double moonPhaseFc) {
 
 	disableVSPIScreens();
 
-	//Serial.print("Day Night: ");
-	//Serial.println(dayNight);
+	// Serial.print("Day Night: ");
+	// Serial.println(dayNight);
 
 	enableScreen1();
 
@@ -2299,7 +2283,6 @@ void dataDisplayCurrentWeatherDayX(double moonPhaseFc) {
 
 	}
 
-
 	// Extract sunrise time.
 
 	time_t sunRise = sunRiseNow;
@@ -2311,10 +2294,10 @@ void dataDisplayCurrentWeatherDayX(double moonPhaseFc) {
 	ts = *localtime(&sunRise);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	//Serial.println("");
-	//Serial.print("Check conversion of sunrise time: ");
-	//Serial.printf("%s\n", buf);
-	//Serial.println("");
+	// Serial.println("");
+	// Serial.print("Check conversion of sunrise time: ");
+	// Serial.printf("%s\n", buf);
+	// Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -2329,9 +2312,9 @@ void dataDisplayCurrentWeatherDayX(double moonPhaseFc) {
 	ts = *localtime(&sunSet);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	//Serial.print("Check conversion of sunset time : ");
-	//Serial.printf("%s\n", buf);
-	//Serial.println("");
+	// Serial.print("Check conversion of sunset time : ");
+	// Serial.printf("%s\n", buf);
+	// Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -2741,10 +2724,10 @@ void dataDisplayForecastDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	ts = *localtime(&sunRise);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	//Serial.println("");
-	//Serial.print("Check conversion of sunrise time: ");
-	//Serial.printf(buf);
-	//Serial.println("");
+	// Serial.println("");
+	// Serial.print("Check conversion of sunrise time: ");
+	// Serial.printf(buf);
+	// Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -2759,9 +2742,9 @@ void dataDisplayForecastDayX(Adafruit_ILI9341& tft, byte screen, unsigned long f
 	ts = *localtime(&sunSet);
 	strftime(buf, sizeof(buf), "%H:%M", &ts);
 
-	//Serial.print("Check conversion of sunset time : ");
-	//Serial.printf(buf);
-	//Serial.println("");
+	// Serial.print("Check conversion of sunset time : ");
+	// Serial.printf(buf);
+	// Serial.println("");
 
 	tft.setFont();
 	tft.setTextSize(0);
@@ -3202,17 +3185,7 @@ void wiFiApMode() {
 
 void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
-	// Draw grid for space screen design
-
-	//for (int x = 20; x < 320; x = x + 20) {
-
-	//	tft.drawFastVLine(x, 0, 240, BLACK);
-	//}
-
-	//for (int x = 20; x < 240; x = x + 20) {
-
-	//	tft.drawFastHLine(0, x, 320, BLACK);
-	//}
+	// Title.
 
 	tft.setFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -3285,7 +3258,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 	double tempTemp7;
 	double tempTemp8;
 
-	// Adjust graph scales for celsius
+	// Adjust graph scales for celsius.
 
 	if (metricImperialState == true) {
 
@@ -3318,7 +3291,7 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 
 	}
 
-	// Adjust graph scales for fahrenheit
+	// Adjust graph scales for fahrenheit.
 
 	else {
 
@@ -3369,6 +3342,8 @@ void drawHourlyTempChart(Adafruit_ILI9341& tft) {
 // Draw hourly rain fall chart.
 
 void drawHourlyRainChart(Adafruit_ILI9341& tft) {
+
+	// Title.
 
 	tft.setFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -3458,19 +3433,8 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 		rainChartScale = rainFallHr8;
 	}
 
-	// Convert Double to Int
-
-	int rainFallHr1Int = rainFallHr1 + 0.5;
-	int rainFallHr2Int = rainFallHr2 + 0.5;
-	int rainFallHr3Int = rainFallHr3 + 0.5;
-	int rainFallHr4Int = rainFallHr4 + 0.5;
-	int rainFallHr5Int = rainFallHr5 + 0.5;
-	int rainFallHr6Int = rainFallHr6 + 0.5;
-	int rainFallHr7Int = rainFallHr7 + 0.5;
-	int rainFallHr8Int = rainFallHr8 + 0.5;
-
 	int hiVal;
-	int increments;
+	double increments;
 
 	if (rainChartScale <= 10) {
 
@@ -3496,16 +3460,16 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 		increments = 10;
 	}
 
-	// Insert scale change including intervals
+	// Insert scale change including intervals.
 
-	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "C", 1, graph_1);
-	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+1", 1, graph_2);
-	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+2", 1, graph_3);
-	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+3", 1, graph_4);
-	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+4", 1, graph_5);
-	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+5", 1, graph_6);
-	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+6", 1, graph_7);
-	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8Int, 1, 0, LTBLUE, WHITE, BLACK, BLACK, WHITE, "+7", 1, graph_8);
+	drawBarChartV1(tft, 1, 20, 210, 10, 170, 0, hiVal, increments, rainFallHr1, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "C", 1, graph_1);
+	drawBarChartV1(tft, 1, 40, 210, 10, 170, 0, hiVal, increments, rainFallHr2, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+1", 1, graph_2);
+	drawBarChartV1(tft, 1, 60, 210, 10, 170, 0, hiVal, increments, rainFallHr3, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+2", 1, graph_3);
+	drawBarChartV1(tft, 1, 80, 210, 10, 170, 0, hiVal, increments, rainFallHr4, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+3", 1, graph_4);
+	drawBarChartV1(tft, 1, 100, 210, 10, 170, 0, hiVal, increments, rainFallHr5, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+4", 1, graph_5);
+	drawBarChartV1(tft, 1, 120, 210, 10, 170, 0, hiVal, increments, rainFallHr6, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+5", 1, graph_6);
+	drawBarChartV1(tft, 1, 140, 210, 10, 170, 0, hiVal, increments, rainFallHr7, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+6", 1, graph_7);
+	drawBarChartV2(tft, 1, 160, 210, 10, 170, 0, hiVal, increments, rainFallHr8, 1, 0, BLUE, WHITE, BLACK, BLACK, WHITE, "+7", 1, graph_8);
 
 	disableVSPIScreens();
 
@@ -3516,6 +3480,8 @@ void drawHourlyRainChart(Adafruit_ILI9341& tft) {
 // Draw hourly pressure chart.
 
 void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
+
+	// Title.
 
 	tft.setFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -3589,14 +3555,14 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 	int tempPressure;
 	tempPressure = pressureHr3 - pressureHr1;
 
-	//Serial.print("Pressure Differece = ");
-	//Serial.println(tempPressure);
-	//Serial.println("");
+	// Serial.print("Pressure Differece = ");
+	// Serial.println(tempPressure);
+	// Serial.println("");
 
 	if (tempPressure <= 0) {
 
-		//Serial.println("");
-		//Serial.print("Pressure is falling function");
+		// Serial.println("");
+		// Serial.print("Pressure is falling function");
 
 		if (tempPressure == 0 || tempPressure == -1) {
 
@@ -3628,8 +3594,8 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 
 	else if (tempPressure > 0) {
 
-		//Serial.println("");
-		//Serial.print("Pressure is rising function");
+		// Serial.println("");
+		// Serial.print("Pressure is rising function");
 
 		if (tempPressure == 1) {
 
@@ -3702,7 +3668,7 @@ void drawHourlyPressureChart(Adafruit_ILI9341& tft) {
 
 void drawCompassChart(Adafruit_ILI9341& tft) {
 
-	// Blank screen and title.
+	// Blank screen then title.
 
 	tft.fillScreen(WHITE);
 
@@ -4048,7 +4014,7 @@ void factoryReset() {
 	tft.setCursor(96, 200);
 	tft.println("Factory Reset");
 	tft.setFont();
-		
+
 	disableVSPIScreens();
 
 	enableScreen2();
@@ -4091,3 +4057,57 @@ void factoryReset() {
 	ESP.restart();
 
 } // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Draw sensor circle.
+
+void drawHttpError() {
+
+	// HTTP Response codes:
+	// 0 = Blue = 429 = Calls exceeds account limit
+	// 1 = Red = 401 = API key problem
+	// 2 = Yellow = 404 = Incorrect city name, ZIP or city ID
+	// 3 = Orange = 50X = You have to contact Open Weather
+	// 4 = Green = 200 = Correct reponse
+	// Else = Purple = Unknown
+
+	// Draw sensor icon.
+
+	enableScreen1();
+
+	if (sensorT == 0) {
+
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, BLUE);
+	}
+
+	else if (sensorT == 1) {
+
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, RED);
+	}
+
+	else if (sensorT == 2) {
+
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, YELLOW);
+	}
+
+	else if (sensorT == 3) {
+
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, ORANGE);
+	}
+
+	else if (sensorT == 4) {
+
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, GREEN);
+	}
+
+	else if (sensorT == 5) {
+
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, PURPLE);
+	}
+
+	disableVSPIScreens();
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
