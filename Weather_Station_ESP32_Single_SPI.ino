@@ -169,7 +169,12 @@ const long debounceDelayMI = 200;			// Debounce delay timing for metric imperial
 // Timer variables (check Open Weather).
 
 unsigned long intervalTGetData = 0;
-const unsigned long intervalPGetData = 3600000; // Reset to 3600000 when finished with design (once per hour)
+const unsigned long intervalPGetData = 900000; // Reset to every 15 minutes
+
+// Timer variables (update time).
+
+unsigned long intervalUT = 0;
+const unsigned long intervalPUT = 60000;	// Update every 1 minute
 
 // Timer variables (check wifi).
 
@@ -1442,6 +1447,16 @@ void loop() {
 
 		factoryReset();
 
+	}
+
+	// Update time each minute.
+
+	if (millis() >= intervalUT + intervalPUT) {
+
+		printLocalTime();
+
+		intervalUT = millis();
+	
 	}
 
 	// Check Open Weather at regular intervals (1 hour as free license is limited per day and month).
