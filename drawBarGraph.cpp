@@ -66,7 +66,7 @@ void drawBarChartV1(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
         }
     }
     // compute level of bar graph that is scaled to the  height and the hi and low vals
-    // this is needed to accompdate for +/- range
+    // this is needed to accompdate for +/- /*range*/
     level = (h * (((curval - loval) / (hival - loval))));
     // draw the bar graph
     // write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
@@ -128,7 +128,7 @@ void drawBarChartV2(Adafruit_ILI9341& tft, byte screen, double x, double y, doub
         }
     }
     // compute level of bar graph that is scaled to the  height and the hi and low vals
-    // this is needed to accompdate for +/- range
+    // this is needed to accompdate for +/- /*range*/
     level = (h * (((curval - loval) / (hival - loval))));
     // draw the bar graph
     // write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update

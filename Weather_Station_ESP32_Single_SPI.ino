@@ -6,16 +6,21 @@
 
 // Libraries.
 
-#include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
+#include <SPI.h>
+
 #include <WiFi.h>
 #include <ESP32Time.h>
+
 #include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
+#include <ESPAsyncWebSrv.h>
+#include <ArduinoJson.hpp>
+#include <ArduinoJson.h>
 #include <HTTPClient.h>
+
 #include <SPIFFS.h>
-#include <ArduinoJSON.h>
+
 #include <Adafruit_MCP23X08.h>		// Additional I/O port expander
 
 #include <Fonts/FreeSans9pt7b.h>	
@@ -50,7 +55,7 @@
 #define VSPI_DC     4  // DC
 #define VSPI_RST    13 // RST							
 
-#define VSPI_CS0	36 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes
+#define VSPI_CS0	21 // This is set to an erroneous pin as to not confuse manual chip selects using digital writes
 #define VSPI_CS1    5  // Screen one chip select
 #define VSPI_CS2    17 // Screen two chip select
 #define VSPI_CS3    16 // Screen three chip select
@@ -615,7 +620,7 @@ String httpGETRequest(const char* serverName) {
 
 	String payload = "{}";
 
-	if (httpResponseCode > 0) { 
+	if (httpResponseCode > 0) {
 		Serial.print("HTTP Response code: ");
 		Serial.println(httpResponseCode);
 		payload = http.getString();
@@ -1387,7 +1392,7 @@ void loop() {
 	// Read capacitive touch.
 
 	touchValueDailyHourly = touchRead(espTouchDailyHourly);
-	
+
 	// Set daily or hourly view.
 
 	if (touchValueDailyHourly < touchThreshold) {
@@ -1413,11 +1418,11 @@ void loop() {
 	}
 
 	// Read capactive touch.
-	
+
 	touchValueMetrixImperial = touchRead(espTouchMetricImperial);
 
 	// Set metrix or imperial.
-	
+
 	if (touchValueMetrixImperial < touchThreshold) {
 
 		if ((millis() - lastDebounceTimeMI) > debounceDelayMI)
@@ -1456,7 +1461,7 @@ void loop() {
 		printLocalTime();
 
 		intervalUT = millis();
-	
+
 	}
 
 	// Check Open Weather at regular intervals (1 hour as free license is limited per day and month).

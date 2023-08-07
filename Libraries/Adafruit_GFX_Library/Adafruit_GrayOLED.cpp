@@ -320,7 +320,7 @@ void Adafruit_GrayOLED::drawPixel(int16_t x, int16_t y, uint16_t color) {
     }
     if (_bpp == 4) {
       uint8_t *pixelptr = &buffer[x / 2 + (y * WIDTH / 2)];
-      // debugf("(%d, %d) -> offset %d\n", x, y, x/2 + (y * WIDTH / 2));
+      // Serial.printf("(%d, %d) -> offset %d\n", x, y, x/2 + (y * WIDTH / 2));
       if (x % 2 == 0) { // even, left nibble
         uint8_t t = pixelptr[0] & 0x0F;
         t |= (color & 0xF) << 4;
