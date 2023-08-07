@@ -9,18 +9,14 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <SPI.h>
-
 #include <WiFi.h>
 #include <ESP32Time.h>
-
 #include <AsyncTCP.h>
 #include <ESPAsyncWebSrv.h>
 #include <ArduinoJson.hpp>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-
 #include <SPIFFS.h>
-
 #include <Adafruit_MCP23X08.h>		// Additional I/O port expander
 
 #include <Fonts/FreeSans9pt7b.h>	
