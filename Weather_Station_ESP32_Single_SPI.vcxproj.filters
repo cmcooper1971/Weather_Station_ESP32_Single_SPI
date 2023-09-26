@@ -15,7 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Weather_Station_ESP32_Single_SPI.ino" />
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
@@ -104,5 +103,6 @@
     <ClCompile Include="drawCompass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Weather_Station_ESP32_Single_SPI.ino" />
   </ItemGroup>
 </Project>

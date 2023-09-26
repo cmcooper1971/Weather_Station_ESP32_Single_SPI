@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32126.315
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Weather_Station_ESP32_Single_SPI", "Weather_Station_ESP32_Single_SPI.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
@@ -29,33 +29,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_GFX_Library", "Lib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adafruit_ILI9341", "Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems", "{60CC9F72-1F0B-4612-BE1D-729237A04900}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESP32-1.0", "..\..\..\..\AppData\Local\arduino15\packages\esp32\hardware\esp32\2.0.0-alpha1\libraries\ESP32\ESP32-1.0.vcxitems", "{5BCDD475-5777-4A39-B3CC-5BBBD60DF752}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Libraries\ESP32Time\ESP32Time.vcxitems*{171f0ebe-ef6d-4954-8742-cd3d343fb5cd}*SharedItemsImports = 9
-		Libraries\ESP32\ESP32.vcxitems*{2eb873b3-a1ea-49f5-9f3d-4ac481f85222}*SharedItemsImports = 9
-		Libraries\AsyncTCP\AsyncTCP.vcxitems*{3001183f-49e5-4d54-8fc7-708f8b55fc4d}*SharedItemsImports = 9
-		Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems*{60cc9f72-1f0b-4612-be1d-729237a04900}*SharedItemsImports = 9
-		Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{67920867-8372-4ab6-b338-3321261dadc1}*SharedItemsImports = 9
-		Libraries\ESPAsyncWebSrv\ESPAsyncWebSrv.vcxitems*{9d67ecff-a868-4776-a687-12d51aaa62f6}*SharedItemsImports = 9
-		Libraries\Adafruit_MCP23017_Arduino_Library\Adafruit_MCP23017_Arduino_Library.vcxitems*{a6f510e7-6328-45d1-837d-54ae8224f30f}*SharedItemsImports = 9
-		Libraries\Wire\Wire.vcxitems*{aaad1bd2-595d-4dda-a0d8-3d2582f6ef38}*SharedItemsImports = 9
-		Libraries\ArduinoJson\ArduinoJson.vcxitems*{b21aba69-ffbf-4d24-b547-2face0b22671}*SharedItemsImports = 9
-		Libraries\SPI\SPI.vcxitems*{bea41d68-e0bb-4510-9f7d-22f0d1aa4ad2}*SharedItemsImports = 9
-		Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\Adafruit_MCP23017_Arduino_Library\Adafruit_MCP23017_Arduino_Library.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\ArduinoJson\ArduinoJson.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\AsyncTCP\AsyncTCP.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\ESP32Time\ESP32Time.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\ESP32\ESP32.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\ESPAsyncWebSrv\ESPAsyncWebSrv.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\SPIFFS\SPIFFS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\WiFi\WiFi.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\Wire\Wire.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
-		Libraries\SPIFFS\SPIFFS.vcxitems*{d324ea03-d9a5-49f4-9eda-092e718a4a3b}*SharedItemsImports = 9
-		Libraries\WiFi\WiFi.vcxitems*{fefa8805-cf2e-4cad-bef7-05012a942e94}*SharedItemsImports = 9
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
@@ -71,5 +47,33 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4266178D-9EAB-44EA-991C-9F28BEDFCA64}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Libraries\ESP32Time\ESP32Time.vcxitems*{171f0ebe-ef6d-4954-8742-cd3d343fb5cd}*SharedItemsImports = 9
+		Libraries\ESP32\ESP32.vcxitems*{2eb873b3-a1ea-49f5-9f3d-4ac481f85222}*SharedItemsImports = 9
+		Libraries\AsyncTCP\AsyncTCP.vcxitems*{3001183f-49e5-4d54-8fc7-708f8b55fc4d}*SharedItemsImports = 9
+		..\..\..\..\AppData\Local\arduino15\packages\esp32\hardware\esp32\2.0.0-alpha1\libraries\ESP32\ESP32-1.0.vcxitems*{5bcdd475-5777-4a39-b3cc-5bbbd60df752}*SharedItemsImports = 9
+		Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems*{60cc9f72-1f0b-4612-be1d-729237a04900}*SharedItemsImports = 9
+		Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{67920867-8372-4ab6-b338-3321261dadc1}*SharedItemsImports = 9
+		Libraries\ESPAsyncWebSrv\ESPAsyncWebSrv.vcxitems*{9d67ecff-a868-4776-a687-12d51aaa62f6}*SharedItemsImports = 9
+		Libraries\Adafruit_MCP23017_Arduino_Library\Adafruit_MCP23017_Arduino_Library.vcxitems*{a6f510e7-6328-45d1-837d-54ae8224f30f}*SharedItemsImports = 9
+		Libraries\Wire\Wire.vcxitems*{aaad1bd2-595d-4dda-a0d8-3d2582f6ef38}*SharedItemsImports = 9
+		Libraries\ArduinoJson\ArduinoJson.vcxitems*{b21aba69-ffbf-4d24-b547-2face0b22671}*SharedItemsImports = 9
+		Libraries\SPI\SPI.vcxitems*{bea41d68-e0bb-4510-9f7d-22f0d1aa4ad2}*SharedItemsImports = 9
+		..\..\..\..\AppData\Local\arduino15\packages\esp32\hardware\esp32\2.0.0-alpha1\libraries\ESP32\ESP32-1.0.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\Adafruit_GFX_Library\Adafruit_GFX_Library.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\Adafruit_ILI9341\Adafruit_ILI9341.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\Adafruit_MCP23017_Arduino_Library\Adafruit_MCP23017_Arduino_Library.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ArduinoJson\ArduinoJson.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\AsyncTCP\AsyncTCP.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ESP32Time\ESP32Time.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ESP32\ESP32.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ESPAsyncWebSrv\ESPAsyncWebSrv.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPIFFS\SPIFFS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\WiFi\WiFi.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\Wire\Wire.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPIFFS\SPIFFS.vcxitems*{d324ea03-d9a5-49f4-9eda-092e718a4a3b}*SharedItemsImports = 9
+		Libraries\WiFi\WiFi.vcxitems*{fefa8805-cf2e-4cad-bef7-05012a942e94}*SharedItemsImports = 9
 	EndGlobalSection
 EndGlobal
